@@ -20,11 +20,12 @@
 #define _FASTDDS_RTPS_MESSAGERECEIVER_H_
 #ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 
-#include <fastdds/rtps/common/all_common.h>
-
-#include <unordered_map>
-#include <mutex>
 #include <functional>
+#include <unordered_map>
+
+#include <fastdds/rtps/common/all_common.h>
+#include <fastdds/rtps/common/VendorId_t.hpp>
+#include <fastrtps/utils/shared_mutex.hpp>
 
 namespace eprosima {
 namespace fastrtps {
@@ -56,11 +57,13 @@ public:
 
     /**
      * Process a new CDR message.
-     * @param[in] loc Locator indicating the sending address.
-     * @param[in] msg Pointer to the message
+     * @param [in] source_locator Locator indicating the sending address.
+     * @param [in] reception_locator Locator indicating the listening address.
+     * @param [in] msg Pointer to the message
      */
     void processCDRMsg(
-            const Locator_t& loc,
+            const Locator_t& source_locator,
+            const Locator_t& reception_locator,
             CDRMessage_t* msg);
 
     // Functions to associate/remove associatedendpoints
@@ -71,15 +74,18 @@ public:
 
 private:
 
-    std::mutex mtx_;
+    mutable eprosima::shared_mutex mtx_;
     std::vector<RTPSWriter*> associated_writers_;
     std::unordered_map<EntityId_t, std::vector<RTPSReader*>> associated_readers_;
 
+#if !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+    //!Pointer to the RTPSParticipantImpl
     RTPSParticipantImpl* participant_;
+#endif // if !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
     //!Protocol version of the message
     ProtocolVersion_t source_version_;
     //!VendorID that created the message
-    VendorId_t source_vendor_id_;
+    fastdds::rtps::VendorId_t source_vendor_id_;
     //!GuidPrefix of the entity that created the message
     GuidPrefix_t source_guid_prefix_;
     //!GuidPrefix of the entity that receives the message. GuidPrefix of the RTPSParticipant.
@@ -101,14 +107,16 @@ private:
     //! Function used to process a received message
     std::function<void(
                 const EntityId_t&,
-                CacheChange_t&)> process_data_message_function_;
+                CacheChange_t&,
+                bool)> process_data_message_function_;
     //! Function used to process a received fragment message
     std::function<void(
                 const EntityId_t&,
                 CacheChange_t&,
                 uint32_t,
                 uint32_t,
-                uint16_t)> process_data_fragment_message_function_;
+                uint16_t,
+                bool)> process_data_fragment_message_function_;
 
     //!Reset the MessageReceiver to process a new message.
     void reset();
@@ -128,7 +136,7 @@ private:
      */
     bool readSubmessageHeader(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh) const;
 
     /**
      * Find if there is a reader (in associated_readers_) that will accept a msg directed
@@ -136,7 +144,7 @@ private:
      */
     bool willAReaderAcceptMsgDirectedTo(
             const EntityId_t& readerID,
-            RTPSReader*& first_reader);
+            RTPSReader*& first_reader) const;
 
     /**
      * Find all readers (in associated_readers_), with the given entity ID, and call the
@@ -145,7 +153,7 @@ private:
     template<typename Functor>
     void findAllReaders(
             const EntityId_t& readerID,
-            const Functor& callback);
+            const Functor& callback) const;
 
     /**@name Processing methods.
      * These methods are designed to read a part of the message
@@ -153,8 +161,10 @@ private:
      * -Modify the message receiver state if necessary.
      * -Add information to the history.
      * -Return an error if the message is malformed.
-     * @param[in,out] msg Pointer to the message
-     * @param[in] smh Pointer to the submessage header
+     * @param[in,out] msg      Pointer to the message
+     * @param[in] smh          Pointer to the submessage header
+     * @param[out] WriterID    Writer EntityID (only for DATA messages)
+     * @param[in] was_decoded  Whether the submessage being processed came from decoding a secured submessage
      * @return True if correct, false otherwise
      */
 
@@ -163,23 +173,31 @@ private:
      *
      * @param msg
      * @param smh
+     * @param writerID
+     * @param was_decoded
      * @return
      */
     bool proc_Submsg_Data(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh,
+            EntityId_t& writerID,
+            bool was_decoded) const;
     bool proc_Submsg_DataFrag(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
-    bool proc_Submsg_Acknack(
-            CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh,
+            bool was_decoded) const;
     bool proc_Submsg_Heartbeat(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh,
+            bool was_decoded) const;
+    bool proc_Submsg_Acknack(
+            CDRMessage_t* msg,
+            SubmessageHeader_t* smh,
+            bool was_decoded) const;
     bool proc_Submsg_Gap(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh,
+            bool was_decoded) const;
     bool proc_Submsg_InfoTS(
             CDRMessage_t* msg,
             SubmessageHeader_t* smh);
@@ -191,29 +209,34 @@ private:
             SubmessageHeader_t* smh);
     bool proc_Submsg_NackFrag(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh,
+            bool was_decoded) const;
     bool proc_Submsg_HeartbeatFrag(
             CDRMessage_t* msg,
-            SubmessageHeader_t* smh);
+            SubmessageHeader_t* smh,
+            bool was_decoded) const;
     ///@}
 
 
     /**
      * @name Variants of received data message processing functions.
      *
-     * @param[in] reader_id The ID of the reader to which the changes is addressed
-     * @param[in] change    The CacheChange with the received data to process
+     * @param[in] reader_id    The ID of the reader to which the changes is addressed
+     * @param[in] change       The CacheChange with the received data to process
+     * @param[in] was_decoded  Whether the submessage being processed came from decoding a secured submessage
      */
     ///@{
  #if HAVE_SECURITY
     void process_data_message_with_security(
             const EntityId_t& reader_id,
-            CacheChange_t& change);
+            CacheChange_t& change,
+            bool was_decoded);
 #endif // HAVE_SECURITY
 
     void process_data_message_without_security(
             const EntityId_t& reader_id,
-            CacheChange_t& change);
+            CacheChange_t& change,
+            bool was_decoded);
     ///@}
 
     /**
@@ -225,6 +248,8 @@ private:
      * @param[in] sample_size             The size of the message
      * @param[in] fragment_starting_num   The index of the first fragment in the message
      * @param[in] fragments_in_submessage The number of fragments in the message
+     * @param[in] was_decoded             Whether the submessage being processed came from decoding a secured
+     *                                    submessage
      */
     ///@{
  #if HAVE_SECURITY
@@ -233,7 +258,8 @@ private:
             CacheChange_t& change,
             uint32_t sample_size,
             uint32_t fragment_starting_num,
-            uint16_t fragments_in_submessage);
+            uint16_t fragments_in_submessage,
+            bool was_decoded);
 #endif // HAVE_SECURITY
 
     void process_data_fragment_message_without_security(
@@ -241,8 +267,24 @@ private:
             CacheChange_t& change,
             uint32_t sample_size,
             uint32_t fragment_starting_num,
-            uint16_t fragments_in_submessage);
+            uint16_t fragments_in_submessage,
+            bool was_decoded);
     ///@}
+
+    /**
+     * Looks for the statistics specific submessage and notifies statistics related to the received message.
+     *
+     * @param [in] source_locator Locator indicating the sending address.
+     * @param [in] reception_locator Locator indicating the listening address.
+     * @param [in] msg Pointer to the message
+     *
+     * @pre The message header has already been read and validated.
+     */
+    void notify_network_statistics(
+            const Locator_t& source_locator,
+            const Locator_t& reception_locator,
+            CDRMessage_t* msg) const;
+
 };
 
 } /* namespace rtps */

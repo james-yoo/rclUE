@@ -18,13 +18,15 @@
 
 #ifndef _FASTDDS_RTPS_SERIALIZEDPAYLOAD_H_
 #define _FASTDDS_RTPS_SERIALIZEDPAYLOAD_H_
-#include <fastrtps/fastrtps_dll.h>
-#include <fastdds/rtps/common/Types.h>
+
 #include <cstring>
 #include <new>
 #include <stdexcept>
 #include <stdint.h>
 #include <stdlib.h>
+
+#include <fastrtps/fastrtps_dll.h>
+#include <fastdds/rtps/common/Types.h>
 
 /*!
  * @brief Maximum payload is maximum of UDP packet size minus 536bytes (RTPSMESSAGE_COMMON_RTPS_PAYLOAD_SIZE)
@@ -42,7 +44,7 @@ namespace rtps {
 #define PL_CDR_LE 0x0003
 
 #if FASTDDS_IS_BIG_ENDIAN_TARGET
-#define DEFAULT_ENCAPSULATION CDR_LE
+#define DEFAULT_ENCAPSULATION CDR_BE
 #define PL_DEFAULT_ENCAPSULATION PL_CDR_BE
 #else
 #define DEFAULT_ENCAPSULATION CDR_LE
@@ -53,6 +55,9 @@ namespace rtps {
 //!@ingroup COMMON_MODULE
 struct RTPS_DllAPI SerializedPayload_t
 {
+    //!Size in bytes of the representation header as specified in the RTPS 2.3 specification chapter 10.
+    static constexpr size_t representation_header_size = 4u;
+
     //!Encapsulation of the data as suggested in the RTPS 2.1 specification chapter 10.
     uint16_t encapsulation;
     //!Actual length of the data
@@ -121,6 +126,10 @@ struct RTPS_DllAPI SerializedPayload_t
             }
         }
         encapsulation = serData->encapsulation;
+        if (length == 0)
+        {
+            return true;
+        }
         memcpy(data, serData->data, length);
         return true;
     }

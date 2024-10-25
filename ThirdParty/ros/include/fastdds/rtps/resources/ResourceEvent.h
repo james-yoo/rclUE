@@ -23,17 +23,20 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 
 #include <atomic>
-#include <fastrtps/utils/TimedConditionVariable.hpp>
-#include <fastrtps/utils/TimedMutex.hpp>
-#include <thread>
+#include <functional>
+#include <memory>
 #include <vector>
 
-namespace eprosima
-{
-namespace fastrtps
-{
-namespace rtps
-{
+#include <fastdds/rtps/attributes/ThreadSettings.hpp>
+#include <fastrtps/utils/TimedMutex.hpp>
+#include <fastrtps/utils/TimedConditionVariable.hpp>
+
+namespace eprosima {
+
+class thread;
+
+namespace fastrtps {
+namespace rtps {
 
 class TimedEventImpl;
 
@@ -44,14 +47,26 @@ class TimedEventImpl;
 class ResourceEvent
 {
 public:
-    ResourceEvent() = default;
+
+    ResourceEvent();
 
     ~ResourceEvent();
 
     /*!
      * @brief Method to initialize the internal thread.
+     *
+     * @param[in]  thread_cfg  Settings to apply to the created thread.
+     * @param[in]  name_fmt    A null-terminated string to be used as the format argument of
+     *                         a `snprintf` like function, taking `thread_id` as additional
+     *                         argument, and used to give a name to the created thread.
+     * @param[in]  thread_id   Single variadic argument passed to the formatting function.
      */
-    void init_thread();
+    void init_thread(
+            const fastdds::rtps::ThreadSettings& thread_cfg = {},
+            const char* name_fmt = "event %u",
+            uint32_t thread_id = 0);
+
+    void stop_thread();
 
     /*!
      * @brief This method informs that a TimedEventImpl has been created.
@@ -59,7 +74,8 @@ public:
      * This method has to be called when creating a TimedEventImpl object.
      * @param event TimedEventImpl object that has been created.
      */
-    void register_timer(TimedEventImpl* event);
+    void register_timer(
+            TimedEventImpl* event);
 
     /*!
      * @brief This method removes a TimedEventImpl object in case it is waiting to be processed by ResourceEvent's
@@ -70,7 +86,8 @@ public:
      * Then it avoids the situation of the execution thread calling the event handler when it was previously removed.
      * @param event TimedEventImpl object that will be deleted and we have to be sure all its operations are cancelled.
      */
-    void unregister_timer(TimedEventImpl* event);
+    void unregister_timer(
+            TimedEventImpl* event);
 
     /*!
      * @brief This method notifies to ResourceEvent that the TimedEventImpl object has operations to be scheduled.
@@ -78,7 +95,8 @@ public:
      * These operations can be the cancellation of the timer or starting another async_wait.
      * @param event TimedEventImpl object that has operations to be scheduled.
      */
-    void notify(TimedEventImpl* event);
+    void notify(
+            TimedEventImpl* event);
 
     /*!
      * @brief This method notifies to ResourceEvent that the TimedEventImpl object has operations to be scheduled.
@@ -88,11 +106,14 @@ public:
      * @param event TimedEventImpl object that has operations to be scheduled.
      * @param timeout Maximum blocking time of the method.
      */
-    void notify(TimedEventImpl* event, const std::chrono::steady_clock::time_point& timeout);
+    void notify(
+            TimedEventImpl* event,
+            const std::chrono::steady_clock::time_point& timeout);
 
 private:
+
     //! Warns the internal thread can stop.
-    std::atomic<bool> stop_{false};
+    std::atomic<bool> stop_{ false };
 
     //! Protects internal data.
     TimedMutex mutex_;
@@ -122,7 +143,7 @@ private:
     std::chrono::steady_clock::time_point current_time_;
 
     //! Execution thread.
-    std::thread thread_;
+    std::unique_ptr<eprosima::thread> thread_;
 
     /*!
      * @brief Registers a new TimedEventImpl object in the internal queue to be processed.
@@ -130,7 +151,8 @@ private:
      * @param event Event to be added in the queue.
      * @return True value if the insertion was successful. In other case, it return False.
      */
-    bool register_timer_nts(TimedEventImpl* event);
+    bool register_timer_nts(
+            TimedEventImpl* event);
 
     //! Method called by the internal thread.
     void event_service();
@@ -150,12 +172,13 @@ private:
         pending_timers_.reserve(timers_count_);
         active_timers_.reserve(timers_count_);
     }
+
 };
 
 } /* namespace rtps */
 } /* namespace fastrtps */
 } /* namespace eprosima */
 
-#endif    //DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
+#endif //DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 
-#endif    //_FASTDDS_RTPS_RESOURCES_RESOURCEEVENT_H_
+#endif //_FASTDDS_RTPS_RESOURCES_RESOURCEEVENT_H_

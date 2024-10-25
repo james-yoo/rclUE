@@ -17,9 +17,18 @@ public class rclUE : ModuleRules
 	{
         string includePath = Path.Combine(InModulePath, "include");
 
+		// since ros2 humble has include path like ue_msgs/ue_msgs/msgs instead of ue_msgs/msgs
         if(Directory.Exists(includePath))
         {
             PublicIncludePaths.Add(includePath);
+			Console.WriteLine("== Add [rclUE] include:");
+			var includes = Directory.EnumerateDirectories(includePath);
+            foreach (var include in includes)
+            {
+                Console.WriteLine(include);
+	            PublicIncludePaths.Add(include);
+            }
+
         }
 
         string libPath = Path.Combine(InModulePath, "lib");

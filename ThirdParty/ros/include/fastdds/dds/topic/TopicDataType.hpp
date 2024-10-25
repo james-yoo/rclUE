@@ -19,14 +19,28 @@
 #ifndef _FASTDDS_TOPICDATATYPE_HPP_
 #define _FASTDDS_TOPICDATATYPE_HPP_
 
-#include <fastrtps/fastrtps_dll.h>
-#include <fastdds/dds/core/policy/QosPolicies.hpp>
-
-#include <string>
 #include <functional>
+#include <memory>
+#include <string>
+
+#include <fastdds/dds/core/policy/QosPolicies.hpp>
+#include <fastdds/rtps/common/CdrSerialization.hpp>
+#include <fastdds/rtps/common/InstanceHandle.h>
+#include <fastdds/rtps/common/SerializedPayload.h>
+
+#include <fastrtps/fastrtps_dll.h>
+#include <fastrtps/utils/md5.h>
+
+// This version of TypeSupport has `is_bounded()`
+#define TOPIC_DATA_TYPE_API_HAS_IS_BOUNDED
+
+// This version of TypeSupport has `is_plain()`
+#define TOPIC_DATA_TYPE_API_HAS_IS_PLAIN
+
+// This version of TypeSupport has `construct_sample()`
+#define TOPIC_DATA_TYPE_API_HAS_CONSTRUCT_SAMPLE
 
 namespace eprosima {
-
 namespace fastrtps {
 
 namespace rtps {
@@ -52,34 +66,44 @@ public:
     /**
      * @brief Constructor
      */
-    RTPS_DllAPI TopicDataType()
-        : m_typeSize(0)
-        , m_isGetKeyDefined(false)
-        , auto_fill_type_object_(true)
-        , auto_fill_type_information_(true)
-    {
-    }
+    RTPS_DllAPI TopicDataType();
 
     /**
      * @brief Destructor
      */
-    RTPS_DllAPI virtual ~TopicDataType()
-    {
-    }
+    RTPS_DllAPI virtual ~TopicDataType();
 
     /**
      * Serialize method, it should be implemented by the user, since it is abstract.
      * It is VERY IMPORTANT that the user sets the SerializedPayload length correctly.
+     *
      * @param[in] data Pointer to the data
      * @param[out] payload Pointer to the payload
      * @return True if correct.
      */
+    // FASTDDS_TODO_BEFORE(3, 0, "Remove this overload")
     RTPS_DllAPI virtual bool serialize(
             void* data,
             fastrtps::rtps::SerializedPayload_t* payload) = 0;
 
     /**
+     * Serialize method, it should be implemented by the user, since it is abstract. If not implemented, this method
+     * will call the serialize method in which the topic data representation is not considered.
+     * It is VERY IMPORTANT that the user sets the SerializedPayload length correctly.
+     *
+     * @param[in] data Pointer to the data
+     * @param[out] payload Pointer to the payload
+     * @param[in] data_representation Representation that should be used to encode the data into the payload.
+     * @return True if correct.
+     */
+    RTPS_DllAPI virtual bool serialize(
+            void* data,
+            fastrtps::rtps::SerializedPayload_t* payload,
+            DataRepresentationId_t data_representation);
+
+    /**
      * Deserialize method, it should be implemented by the user, since it is abstract.
+     *
      * @param[in] payload Pointer to the payload
      * @param[out] data Pointer to the data
      * @return True if correct.
@@ -88,21 +112,35 @@ public:
             fastrtps::rtps::SerializedPayload_t* payload,
             void* data) = 0;
 
-    /**
-     * @brief Gets the SerializedSizeProvider function
-     * @param data Pointer
-     * @return function
+    /*!
+     * @brief Returns a function which can be used to calculate the serialized size of the provided data.
+     *
+     * @param[in] data Pointer to data.
+     * @return Functor which calculates the serialized size of the data.
      */
     RTPS_DllAPI virtual std::function<uint32_t()> getSerializedSizeProvider(
             void* data) = 0;
 
+    /*!
+     * @brief Returns a function which can be used to calculate the serialized size of the provided data.
+     *
+     * @param[in] data Pointer to data.
+     * @param[in] data_representation Representation that should be used for calculating the serialized size.
+     * @return Functor which calculates the serialized size of the data.
+     */
+    RTPS_DllAPI virtual std::function<uint32_t()> getSerializedSizeProvider(
+            void* data,
+            DataRepresentationId_t data_representation);
+
     /**
      * Create a Data Type.
+     *
      * @return Void pointer to the created object.
      */
     RTPS_DllAPI virtual void* createData() = 0;
     /**
      * Remove a previously created object.
+     *
      * @param data Pointer to the created Data.
      */
     RTPS_DllAPI virtual void deleteData(
@@ -110,6 +148,7 @@ public:
 
     /**
      * Get the key associated with the data.
+     *
      * @param[in] data Pointer to the data.
      * @param[out] ihandle Pointer to the Handle.
      * @param[in] force_md5 Force MD5 checking.
@@ -122,6 +161,7 @@ public:
 
     /**
      * Set topic data type name
+     *
      * @param nam Topic data type name
      */
     RTPS_DllAPI inline void setName(
@@ -132,6 +172,7 @@ public:
 
     /**
      * Get topic data type name
+     *
      * @return Topic data type name
      */
     RTPS_DllAPI inline const char* getName() const
@@ -141,6 +182,7 @@ public:
 
     /**
      * Get the type object auto-fill configuration
+     *
      * @return true if the type object should be auto-filled
      */
     RTPS_DllAPI inline bool auto_fill_type_object() const
@@ -150,6 +192,7 @@ public:
 
     /**
      * Set the type object auto-fill configuration
+     *
      * @param auto_fill_type_object new value to set
      */
     RTPS_DllAPI inline void auto_fill_type_object(
@@ -160,6 +203,7 @@ public:
 
     /**
      * Get the type information auto-fill configuration
+     *
      * @return true if the type information should be auto-filled
      */
     RTPS_DllAPI inline bool auto_fill_type_information() const
@@ -169,6 +213,7 @@ public:
 
     /**
      * Set type information auto-fill configuration
+     *
      * @param auto_fill_type_information new value to set
      */
     RTPS_DllAPI inline void auto_fill_type_information(
@@ -179,6 +224,7 @@ public:
 
     /**
      * Get the type identifier
+     *
      * @return TypeIdV1
      */
     RTPS_DllAPI inline const std::shared_ptr<TypeIdV1> type_identifier() const
@@ -188,6 +234,7 @@ public:
 
     /**
      * Set type identifier
+     *
      * @param id new value for TypeIdV1
      */
     RTPS_DllAPI inline void type_identifier(
@@ -198,6 +245,7 @@ public:
 
     /**
      * Set type identifier
+     *
      * @param id shared pointer to TypeIdV1
      */
     RTPS_DllAPI inline void type_identifier(
@@ -208,6 +256,7 @@ public:
 
     /**
      * Get the type object
+     *
      * @return TypeObjectV1
      */
     RTPS_DllAPI inline const std::shared_ptr<TypeObjectV1> type_object() const
@@ -217,6 +266,7 @@ public:
 
     /**
      * Set type object
+     *
      * @param object new value for TypeObjectV1
      */
     RTPS_DllAPI inline void type_object(
@@ -227,6 +277,7 @@ public:
 
     /**
      * Set type object
+     *
      * @param object shared pointer to TypeObjectV1
      */
     RTPS_DllAPI inline void type_object(
@@ -237,6 +288,7 @@ public:
 
     /**
      * Get the type information
+     *
      * @return TypeInformation
      */
     RTPS_DllAPI inline const std::shared_ptr<xtypes::TypeInformation> type_information() const
@@ -246,6 +298,7 @@ public:
 
     /**
      * Set type information
+     *
      * @param info new value for TypeInformation
      */
     RTPS_DllAPI inline void type_information(
@@ -256,12 +309,52 @@ public:
 
     /**
      * Set type information
+     *
      * @param info shared pointer to TypeInformation
      */
     RTPS_DllAPI inline void type_information(
             std::shared_ptr<xtypes::TypeInformation> info)
     {
         type_information_ = std::move(info);
+    }
+
+    /**
+     * Checks if the type is bounded.
+     */
+    RTPS_DllAPI virtual inline bool is_bounded() const
+    {
+        return false;
+    }
+
+    /**
+     * Checks if the type is plain when using default encoding.
+     */
+    RTPS_DllAPI virtual inline bool is_plain() const
+    {
+        return false;
+    }
+
+    /**
+     * Checks if the type is plain when using a specific encoding.
+     */
+    RTPS_DllAPI virtual inline bool is_plain(
+            DataRepresentationId_t) const
+    {
+        return false;
+    }
+
+    /**
+     * Construct a sample on a memory location.
+     *
+     * @param memory Pointer to the memory location where the sample should be constructed.
+     *
+     * @return whether this type supports in-place construction or not.
+     */
+    RTPS_DllAPI virtual inline bool construct_sample(
+            void* memory) const
+    {
+        static_cast<void>(memory);
+        return false;
     }
 
     //! Maximum serialized size of the type in bytes.

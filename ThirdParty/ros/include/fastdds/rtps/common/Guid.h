@@ -76,7 +76,9 @@ struct RTPS_DllAPI GUID_t
     }
 
     /**
-     * Checks whether this guid is for an entity on the same host as another guid.
+     * Checks whether this guid is from an entity on the same host as another guid.
+     *
+     * @note This method assumes the value of \c other_guid was originally assigned by Fast-DDS vendor.
      *
      * @param other_guid GUID_t to compare to.
      *
@@ -85,11 +87,23 @@ struct RTPS_DllAPI GUID_t
     bool is_on_same_host_as(
             const GUID_t& other_guid) const
     {
-        return memcmp(guidPrefix.value, other_guid.guidPrefix.value, 4) == 0;
+        return guidPrefix.is_on_same_host_as(other_guid.guidPrefix);
+    }
+
+    /**
+     * Checks whether this guid is from a (Fast-DDS) entity created on this host (from where this method is called).
+     *
+     * @return true when this guid is from a (Fast-DDS) entity created on this host, false otherwise.
+     */
+    bool is_from_this_host() const
+    {
+        return guidPrefix.is_from_this_host();
     }
 
     /**
      * Checks whether this guid is for an entity on the same host and process as another guid.
+     *
+     * @note This method assumes the value of \c other_guid was originally assigned by Fast-DDS vendor.
      *
      * @param other_guid GUID_t to compare to.
      *
@@ -98,7 +112,17 @@ struct RTPS_DllAPI GUID_t
     bool is_on_same_process_as(
             const GUID_t& other_guid) const
     {
-        return memcmp(guidPrefix.value, other_guid.guidPrefix.value, 8) == 0;
+        return guidPrefix.is_on_same_process_as(other_guid.guidPrefix);
+    }
+
+    /**
+     * Checks whether this guid is from a (Fast-DDS) entity created on this process (from where this method is called).
+     *
+     * @return true when this guid is from a (Fast-DDS) entity created on this process, false otherwise.
+     */
+    bool is_from_this_process() const
+    {
+        return guidPrefix.is_from_this_process();
     }
 
     /**
@@ -121,7 +145,6 @@ struct RTPS_DllAPI GUID_t
     {
         return *reinterpret_cast<const InstanceHandle_t*>(this);
     }
-
 };
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
@@ -170,29 +193,19 @@ inline bool operator <(
         const GUID_t& g1,
         const GUID_t& g2)
 {
-    for (uint8_t i = 0; i < 12; ++i)
+    auto prefix_cmp = GuidPrefix_t::cmp(g1.guidPrefix, g2.guidPrefix);
+    if (prefix_cmp < 0)
     {
-        if (g1.guidPrefix.value[i] < g2.guidPrefix.value[i])
-        {
-            return true;
-        }
-        else if (g1.guidPrefix.value[i] > g2.guidPrefix.value[i])
-        {
-            return false;
-        }
+        return true;
     }
-    for (uint8_t i = 0; i < 4; ++i)
+    else if (prefix_cmp > 0)
     {
-        if (g1.entityId.value[i] < g2.entityId.value[i])
-        {
-            return true;
-        }
-        else if (g1.entityId.value[i] > g2.entityId.value[i])
-        {
-            return false;
-        }
+        return false;
     }
-    return false;
+    else
+    {
+        return g1.entityId < g2.entityId;
+    }
 }
 
 #endif // ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC

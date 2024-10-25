@@ -15,14 +15,16 @@
 #ifndef TYPES_BASE_H
 #define TYPES_BASE_H
 
-#include <fastdds/rtps/common/Types.h>
-#include <bitset>
-#include <string>
-#include <map>
-#include <vector>
-#include <cctype>
 #include <algorithm>
+#include <bitset>
+#include <cctype>
+#include <map>
 #include <memory>
+#include <string>
+#include <type_traits>
+#include <vector>
+
+#include <fastdds/rtps/common/Types.h>
 
 namespace eprosima {
 namespace fastdds {
@@ -36,6 +38,9 @@ class Cdr;
 } // namespace fastcdr
 namespace fastrtps {
 namespace types {
+
+//! A special value indicating an unlimited quantity
+constexpr uint32_t BOUND_UNLIMITED = 0;
 
 using eprosima::fastrtps::rtps::octet;
 
@@ -180,54 +185,40 @@ const uint16_t MemberFlagMinimalMask = 0x003f;
 /*!
  * @brief This class represents the enumeration ReturnCode_t.
  */
-/*
-   enum ReturnCode_t : uint32_t
-   {
-    RETCODE_OK = 0,
-    RETCODE_ERROR = 1,
-    RETCODE_UNSUPPORTED = 2,
-    RETCODE_BAD_PARAMETER = 3,
-    RETCODE_PRECONDITION_NOT_MET = 4,
-    RETCODE_OUT_OF_RESOURCES = 5,
-    RETCODE_NOT_ENABLED = 6,
-    RETCODE_IMMUTABLE_POLICY = 7,
-    RETCODE_INCONSISTENT_POLICY = 8,
-    RETCODE_ALREADY_DELETED = 9,
-    RETCODE_TIMEOUT = 10,
-    RETCODE_NO_DATA = 11,
-    RETCODE_ILLEGAL_OPERATION = 12
-   };
- */
-class ReturnCode_t;
 
 class RTPS_DllAPI ReturnCode_t
 {
+    uint32_t value_;
+
 public:
 
-    ReturnCode_t(
-            uint32_t value)
+    enum ReturnCodeValue
     {
-        value_ = value;
+        RETCODE_OK = 0,
+        RETCODE_ERROR = 1,
+        RETCODE_UNSUPPORTED = 2,
+        RETCODE_BAD_PARAMETER = 3,
+        RETCODE_PRECONDITION_NOT_MET = 4,
+        RETCODE_OUT_OF_RESOURCES = 5,
+        RETCODE_NOT_ENABLED = 6,
+        RETCODE_IMMUTABLE_POLICY = 7,
+        RETCODE_INCONSISTENT_POLICY = 8,
+        RETCODE_ALREADY_DELETED = 9,
+        RETCODE_TIMEOUT = 10,
+        RETCODE_NO_DATA = 11,
+        RETCODE_ILLEGAL_OPERATION = 12,
+        RETCODE_NOT_ALLOWED_BY_SECURITY = 13
+    };
+
+    ReturnCode_t()
+        : value_(RETCODE_OK)
+    {
     }
 
     ReturnCode_t(
-            const ReturnCode_t& code)
+            uint32_t e)
     {
-        value_ = code.value_;
-    }
-
-    explicit operator bool() = delete;
-
-    bool operator !() const
-    {
-        return value_ != ReturnCode_t::RETCODE_OK.value_;
-    }
-
-    ReturnCode_t& operator =(
-            const ReturnCode_t& c)
-    {
-        value_ = c.value_;
-        return *this;
+        value_ = e;
     }
 
     bool operator ==(
@@ -242,35 +233,57 @@ public:
         return value_ != c.value_;
     }
 
+    explicit operator bool() = delete;
+
     uint32_t operator ()() const
     {
         return value_;
     }
 
-    static const ReturnCode_t RETCODE_OK;
-    static const ReturnCode_t RETCODE_ERROR;
-    static const ReturnCode_t RETCODE_UNSUPPORTED;
-    static const ReturnCode_t RETCODE_BAD_PARAMETER;
-    static const ReturnCode_t RETCODE_PRECONDITION_NOT_MET;
-    static const ReturnCode_t RETCODE_OUT_OF_RESOURCES;
-    static const ReturnCode_t RETCODE_NOT_ENABLED;
-    static const ReturnCode_t RETCODE_IMMUTABLE_POLICY;
-    static const ReturnCode_t RETCODE_INCONSISTENT_POLICY;
-    static const ReturnCode_t RETCODE_ALREADY_DELETED;
-    static const ReturnCode_t RETCODE_TIMEOUT;
-    static const ReturnCode_t RETCODE_NO_DATA;
-    static const ReturnCode_t RETCODE_ILLEGAL_OPERATION;
+    bool operator !() const
+    {
+        return value_ != 0;
+    }
 
-private:
-
-    uint32_t value_ = ReturnCode_t::RETCODE_OK.value_;
 };
+
+RTPS_DllAPI inline bool operator ==(
+        ReturnCode_t::ReturnCodeValue a,
+        const ReturnCode_t& b)
+{
+    return b.operator ==(
+        a);
+}
+
+RTPS_DllAPI inline bool operator !=(
+        ReturnCode_t::ReturnCodeValue a,
+        const ReturnCode_t& b)
+{
+    return b.operator !=(
+        a);
+}
+
+RTPS_DllAPI inline bool operator ==(
+        uint32_t a,
+        const ReturnCode_t& b)
+{
+    return b.operator ==(
+        a);
+}
+
+RTPS_DllAPI inline bool operator !=(
+        uint32_t a,
+        const ReturnCode_t& b)
+{
+    return b.operator !=(
+        a);
+}
 
 // TODO Remove this alias when Fast-RTPS reaches version 2
 using ResponseCode = ReturnCode_t;
 
 typedef uint32_t MemberId;
-#define MEMBER_ID_INVALID 0X0FFFFFFF
+constexpr uint32_t MEMBER_ID_INVALID {0X0FFFFFFF};
 #define INDEX_INVALID UINT32_MAX
 
 const int32_t MAX_BITMASK_LENGTH = 64;
@@ -442,20 +455,30 @@ public:
         b ? m_MemberFlag.set(6) : m_MemberFlag.reset(6);
     }
 
-    void serialize(
-            eprosima::fastcdr::Cdr& cdr) const;
-
-    void deserialize(
-            eprosima::fastcdr::Cdr& cdr);
-
-    static size_t getCdrSerializedSize(
-            const MemberFlag&,
-            size_t current_alignment = 0);
-
     bool operator ==(
             const MemberFlag& other) const
     {
         return m_MemberFlag == other.m_MemberFlag;
+    }
+
+    std::bitset<16> bitset() const
+    {
+        std::string str_value;
+
+        str_value = m_MemberFlag.to_string() + str_value;
+
+        return std::bitset<16>(str_value);
+    }
+
+    void bitset(
+            const std::bitset<16>& bitset)
+    {
+        std::string str_value {bitset.to_string()};
+        size_t base_diff {0};
+        size_t last_post {std::string::npos};
+
+        base_diff += 16;
+        m_MemberFlag = std::bitset<16>(str_value.substr(str_value.length() - base_diff, last_post));
     }
 
 };
@@ -571,20 +594,30 @@ public:
         b ? m_TypeFlag.set(4) : m_TypeFlag.reset(4);
     }
 
-    void serialize(
-            eprosima::fastcdr::Cdr& cdr) const;
-
-    void deserialize(
-            eprosima::fastcdr::Cdr& cdr);
-
-    static size_t getCdrSerializedSize(
-            const TypeFlag&,
-            size_t current_alignment = 0);
-
     bool operator ==(
             const TypeFlag& other) const
     {
         return m_TypeFlag == other.m_TypeFlag;
+    }
+
+    std::bitset<16> bitset() const
+    {
+        std::string str_value;
+
+        str_value = m_TypeFlag.to_string() + str_value;
+
+        return std::bitset<16>(str_value);
+    }
+
+    void bitset(
+            const std::bitset<16>& bitset)
+    {
+        std::string str_value {bitset.to_string()};
+        size_t base_diff {0};
+        size_t last_post {std::string::npos};
+
+        base_diff += 16;
+        m_TypeFlag = std::bitset<16>(str_value.substr(str_value.length() - base_diff, last_post));
     }
 
 };

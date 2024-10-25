@@ -44,6 +44,44 @@ struct RTPS_DllAPI GuidPrefix_t
         memset(value, 0, size);
     }
 
+    /**
+     * Checks whether this guid prefix is from an entity on the same host as another guid prefix.
+     *
+     * @note This method assumes the value of \c other_guid_prefix was originally assigned by Fast-DDS vendor.
+     *
+     * @param other_guid_prefix GuidPrefix_t to compare to.
+     *
+     * @return true when this guid prefix is on the same host, false otherwise.
+     */
+    bool is_on_same_host_as(
+            const GuidPrefix_t& other_guid_prefix) const;
+
+    /**
+     * Checks whether this guid prefix is from a (Fast-DDS) entity created on this host (from where this method is called).
+     *
+     * @return true when this guid prefix is from a (Fast-DDS) entity created on this host, false otherwise.
+     */
+    bool is_from_this_host() const;
+
+    /**
+     * Checks whether this guid prefix is for an entity on the same host and process as another guid prefix.
+     *
+     * @note This method assumes the value of \c other_guid_prefix was originally assigned by Fast-DDS vendor.
+     *
+     * @param other_guid_prefix GuidPrefix_t to compare to.
+     *
+     * @return true when this guid prefix is on the same host and process, false otherwise.
+     */
+    bool is_on_same_process_as(
+            const GuidPrefix_t& other_guid_prefix) const;
+
+    /**
+     * Checks whether this guid prefix is from a (Fast-DDS) entity created on this host and process (from where this method is called).
+     *
+     * @return true when this guid prefix is from a (Fast-DDS) entity created on this host and process, false otherwise.
+     */
+    bool is_from_this_process() const;
+
     static GuidPrefix_t unknown()
     {
         return GuidPrefix_t();
@@ -76,12 +114,29 @@ struct RTPS_DllAPI GuidPrefix_t
     /**
      * Guid prefix minor operator
      * @param prefix Second guid prefix to compare
-     * @return True if prefix is higher
+     * @return True if prefix is higher than this
      */
     bool operator <(
             const GuidPrefix_t& prefix) const
     {
         return std::memcmp(value, prefix.value, size) < 0;
+    }
+
+    /**
+     * Guid Prefix compare static method.
+     *
+     * @param prefix1 First guid prefix to compare
+     * @param prefix2 Second guid prefix to compare
+     *
+     * @return 0 if \c prefix1 is equal to \c prefix2 .
+     * @return < 0 if \c prefix1 is lower than \c prefix2 .
+     * @return > 0 if \c prefix1 is higher than \c prefix2 .
+     */
+    static int cmp(
+            const GuidPrefix_t& prefix1,
+            const GuidPrefix_t& prefix2)
+    {
+        return std::memcmp(prefix1.value, prefix2.value, size);
     }
 
 #endif // ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
@@ -93,15 +148,17 @@ inline std::ostream& operator <<(
         std::ostream& output,
         const GuidPrefix_t& guiP)
 {
-    output << std::hex;
-    char old_fill = output.fill('0');
+    std::stringstream ss;
+    ss << std::hex;
+    char old_fill = ss.fill('0');
     for (uint8_t i = 0; i < 11; ++i)
     {
-        output << std::setw(2) << (int)guiP.value[i] << ".";
+        ss << std::setw(2) << (int)guiP.value[i] << ".";
     }
-    output << std::setw(2) << (int)guiP.value[11];
-    output.fill(old_fill);
-    return output << std::dec;
+    ss << std::setw(2) << (int)guiP.value[11];
+    ss.fill(old_fill);
+    ss << std::dec;
+    return output << ss.str();
 }
 
 inline std::istream& operator >>(
@@ -142,6 +199,7 @@ inline std::istream& operator >>(
         }
         catch (std::ios_base::failure& )
         {
+            guiP = GuidPrefix_t::unknown();
         }
 
         input.exceptions(excp_mask);

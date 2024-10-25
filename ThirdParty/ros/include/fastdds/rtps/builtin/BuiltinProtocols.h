@@ -24,7 +24,9 @@
 #include <list>
 
 #include <fastdds/rtps/attributes/RTPSParticipantAttributes.h>
-#include <fastdds/rtps/network/NetworkFactory.h>
+#include <fastdds/rtps/builtin/data/ContentFilterProperty.hpp>
+
+#include <fastrtps/utils/shared_mutex.hpp>
 
 namespace eprosima {
 
@@ -52,6 +54,7 @@ class WLP;
 class RTPSParticipantImpl;
 class RTPSWriter;
 class RTPSReader;
+class NetworkFactory;
 
 /**
  * Class BuiltinProtocols that contains builtin endpoints implementing the discovery and liveliness protocols.
@@ -66,6 +69,12 @@ private:
     BuiltinProtocols();
     virtual ~BuiltinProtocols();
 
+    /*
+     * Mutex to protect the m_DiscoveryServers collection. Element access is not protected by this mutex, the PDP mutex
+     * needs to be used when querying or modifying mutable members of the collection.
+     */
+    mutable eprosima::shared_mutex discovery_mutex_;
+
 public:
 
     /**
@@ -79,6 +88,11 @@ public:
             BuiltinAttributes& attributes);
 
     /**
+     * Enable the builtin protocols
+     */
+    void enable();
+
+    /**
      * Update the metatraffic locatorlist after it was created. Because when you create
      * the EDP readers you are not sure the selected endpoints can be used.
      * @param loclist LocatorList to update
@@ -88,11 +102,10 @@ public:
             LocatorList_t& loclist);
 
     /**
-     * Traverses the list of discover servers translating from remote to local locators
-     * if possible
-     * @param nf NetworkFactory used to make the translation
+     * Traverses the list of discover servers filtering out unsupported or not allowed remote locators
+     * @param nf NetworkFactory used to make the filtering
      */
-    void transform_server_remote_locators(
+    void filter_server_remote_locators(
             NetworkFactory& nf);
 
     //!BuiltinAttributes of the builtin protocols.
@@ -127,15 +140,18 @@ public:
             const fastdds::dds::WriterQos& wqos);
     /**
      * Add a local Reader to the BuiltinProtocols.
-     * @param R Pointer to the RTPSReader.
-     * @param topicAtt Attributes of the associated topic
-     * @param rqos QoS policies dictated by the subscriber
+     * @param R               Pointer to the RTPSReader.
+     * @param topicAtt        Attributes of the associated topic
+     * @param rqos            QoS policies dictated by the subscriber
+     * @param content_filter  Optional content filtering information.
      * @return True if correct.
      */
     bool addLocalReader(
             RTPSReader* R,
             const TopicAttributes& topicAtt,
-            const fastdds::dds::ReaderQos& rqos);
+            const fastdds::dds::ReaderQos& rqos,
+            const fastdds::rtps::ContentFilterProperty* content_filter = nullptr);
+
     /**
      * Update a local Writer QOS
      * @param W Writer to update
@@ -149,15 +165,17 @@ public:
             const fastdds::dds::WriterQos& wqos);
     /**
      * Update a local Reader QOS
-     * @param R Reader to update
-     * @param topicAtt Attributes of the associated topic
-     * @param qos New Reader QoS
+     * @param R               Reader to update
+     * @param topicAtt        Attributes of the associated topic
+     * @param qos             New Reader QoS
+     * @param content_filter  Optional content filtering information.
      * @return
      */
     bool updateLocalReader(
             RTPSReader* R,
             const TopicAttributes& topicAtt,
-            const fastdds::dds::ReaderQos& qos);
+            const fastdds::dds::ReaderQos& qos,
+            const fastdds::rtps::ContentFilterProperty* content_filter = nullptr);
     /**
      * Remove a local Writer from the builtinProtocols.
      * @param W Pointer to the writer.
@@ -179,6 +197,15 @@ public:
     void stopRTPSParticipantAnnouncement();
     //!Reset to timer to make periodic RTPSParticipant Announcements.
     void resetRTPSParticipantAnnouncement();
+
+    /**
+     * Get Discovery mutex
+     * @return Associated Mutex
+     */
+    inline eprosima::shared_mutex& getDiscoveryMutex() const
+    {
+        return discovery_mutex_;
+    }
 
 };
 

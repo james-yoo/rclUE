@@ -83,6 +83,10 @@ inline bool readInt64(
         CDRMessage_t* msg,
         int64_t* lolo);
 
+inline bool readUInt64(
+        CDRMessage_t* msg,
+        uint64_t* lolo);
+
 inline bool readSequenceNumber(
         CDRMessage_t* msg,
         SequenceNumber_t* sn);
@@ -136,15 +140,18 @@ inline bool readBinaryProperty(
 
 inline bool readPropertySeq(
         CDRMessage_t* msg,
-        PropertySeq& properties);
+        PropertySeq& properties,
+        const uint32_t parameter_length);
 
 inline bool readBinaryPropertySeq(
         CDRMessage_t* msg,
-        BinaryPropertySeq& binary_properties);
+        BinaryPropertySeq& binary_properties,
+        const uint32_t parameter_length);
 
 inline bool readDataHolder(
         CDRMessage_t* msg,
-        DataHolder& data_holder);
+        DataHolder& data_holder,
+        const uint32_t parameter_length);
 
 inline bool readDataHolderSeq(
         CDRMessage_t* msg,
@@ -196,6 +203,21 @@ inline bool appendMsg(
  */
 /// @{
 
+template<typename T>
+inline bool addPrimitive(
+        CDRMessage_t* msg,
+        T value);
+
+inline bool hasSpace(
+        CDRMessage_t* msg,
+        const uint32_t length);
+
+inline void copyToBuffer(
+        CDRMessage_t* msg,
+        const octet* data,
+        const uint32_t length,
+        bool reverse = false);
+
 inline bool addData(
         CDRMessage_t*,
         const octet*,
@@ -224,6 +246,10 @@ inline bool addUInt32(
 inline bool addInt64(
         CDRMessage_t* msg,
         int64_t lo);
+
+inline bool addUInt64(
+        CDRMessage_t* msg,
+        uint64_t lo);
 
 inline bool addEntityId(
         CDRMessage_t* msg,
@@ -304,6 +330,17 @@ inline bool addParticipantGenericMessage(
 
 ///@}
 
+/**
+ * @brief Skip bytes in serialized buffer
+ *
+ * @param msg The CDR message
+ * @param length The number of bytes to skip
+ * @return true if skipped, false otherwise
+ */
+inline bool skip(
+        CDRMessage_t* msg,
+        uint32_t length);
+
 } /* namespace CDRMessage */
 
 } /* namespace rtps */
@@ -315,5 +352,5 @@ inline bool addParticipantGenericMessage(
 #include <fastdds/rtps/messages/CDRMessage.hpp>
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-#endif
+#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 #endif /* _FASTDDS_RTPS_CDRMESSAGE_H_ */

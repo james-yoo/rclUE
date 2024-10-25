@@ -19,18 +19,37 @@
 #ifndef _FASTDDS_RTPS_RTPSParticipant_H_
 #define _FASTDDS_RTPS_RTPSParticipant_H_
 
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <fastrtps/fastrtps_dll.h>
+
 #include <fastdds/rtps/common/Guid.h>
-#include <fastdds/rtps/reader/StatefulReader.h>
 #include <fastdds/rtps/attributes/RTPSParticipantAttributes.h>
+#include <fastdds/rtps/builtin/data/ContentFilterProperty.hpp>
+#include <fastdds/statistics/IListeners.hpp>
+#include <fastrtps/fastrtps_dll.h>
 #include <fastrtps/qos/ReaderQos.h>
 #include <fastrtps/qos/WriterQos.h>
 
 namespace eprosima {
 
 namespace fastdds {
+
+#ifdef FASTDDS_STATISTICS
+
+namespace statistics {
+
+class MonitorServiceStatusData;
+namespace rtps {
+
+struct IStatusQueryable;
+struct IStatusObserver;
+
+} // namespace rtps
+} // namespace statistics
+
+#endif //FASTDDS_STATISTICS
+
 namespace dds {
 namespace builtin {
 
@@ -52,6 +71,9 @@ class RTPSWriter;
 class RTPSReader;
 class WriterProxyData;
 class ReaderProxyData;
+class EndpointAttributes;
+class WriterAttributes;
+class ReaderAttributes;
 class ResourceEvent;
 class WLP;
 
@@ -63,6 +85,7 @@ class RTPS_DllAPI RTPSParticipant
 {
     friend class RTPSParticipantImpl;
     friend class RTPSDomain;
+    friend class RTPSDomainImpl;
 
 private:
 
@@ -136,15 +159,24 @@ public:
 
     /**
      * Register a RTPSReader in the builtin Protocols.
-     * @param Reader Pointer to the RTPSReader.
-     * @param topicAtt Topic Attributes where you want to register it.
-     * @param rqos ReaderQos.
+     * @param Reader          Pointer to the RTPSReader.
+     * @param topicAtt        Topic Attributes where you want to register it.
+     * @param rqos            ReaderQos.
+     * @param content_filter  Optional content filtering information.
      * @return True if correctly registered.
      */
     bool registerReader(
             RTPSReader* Reader,
             const TopicAttributes& topicAtt,
-            const ReaderQos& rqos);
+            const ReaderQos& rqos,
+            const fastdds::rtps::ContentFilterProperty* content_filter = nullptr);
+
+    /**
+     * Update participant attributes.
+     * @param patt New participant attributes.
+     */
+    void update_attributes(
+            const RTPSParticipantAttributes& patt);
 
     /**
      * Update writer QOS
@@ -160,15 +192,17 @@ public:
 
     /**
      * Update reader QOS
-     * @param Reader to update
-     * @param topicAtt Topic Attributes where you want to register it.
-     * @param rqos New reader QoS
+     * @param Reader          Pointer to the RTPSReader to update
+     * @param topicAtt        Topic Attributes where you want to register it.
+     * @param rqos            New reader QoS
+     * @param content_filter  Optional content filtering information.
      * @return true on success
      */
     bool updateReader(
             RTPSReader* Reader,
             const TopicAttributes& topicAtt,
-            const ReaderQos& rqos);
+            const ReaderQos& rqos,
+            const fastdds::rtps::ContentFilterProperty* content_filter = nullptr);
 
     /**
      * Returns a list with the participant names.
@@ -238,13 +272,188 @@ public:
      */
     void enable();
 
-private:
+    /**
+     * @brief Ignore all messages coming from the RTPSParticipant
+     *
+     * @param[in] participant_guid RTPSParticipant GUID to be ignored
+     * @return True if correctly included into the ignore collection. False otherwise.
+     */
+    bool ignore_participant(
+            const GuidPrefix_t& participant_guid);
+
+    /**
+     * @brief Ignore all messages coming from the RTPSWriter
+     *
+     * @param[in] writer_guid RTPSWriter GUID to be ignored
+     * @return True if correctly included into the ignore collection. False otherwise.
+     */
+    bool ignore_writer(
+            const GUID_t& writer_guid);
+
+    /**
+     * @brief Ignore all messages coming from the RTPSReader
+     *
+     * @param[in] reader_guid RTPSReader GUID to be ignored
+     * @return True if correctly included into the ignore collection. False otherwise.
+     */
+    bool ignore_reader(
+            const GUID_t& reader_guid);
+
+    /**
+     * @brief Returns registered transports' netmask filter information (transport's netmask filter kind and allowlist).
+     *
+     * @return A vector with all registered transports' netmask filter information.
+     */
+    std::vector<fastdds::rtps::TransportNetmaskFilterInfo> get_netmask_filter_info() const;
+
+#if HAVE_SECURITY
+
+    /**
+     * @brief Checks whether the writer has security attributes enabled
+     * @param writer_attributes Attributes of the writer as given to the RTPSParticipantImpl::create_writer
+     */
+
+    bool is_security_enabled_for_writer(
+            const WriterAttributes& writer_attributes);
+
+    /**
+     * @brief Checks whether the reader has security attributes enabled
+     * @param reader_attributes Attributes of the reader as given to the RTPSParticipantImpl::create_reader
+     */
+
+    bool is_security_enabled_for_reader(
+            const ReaderAttributes& reader_attributes);
+
+#endif // if HAVE_SECURITY
+
+#ifdef FASTDDS_STATISTICS
+
+    /**
+     * Add a listener to receive statistics backend callbacks
+     * @param listener
+     * @param kind combination of fastdds::statistics::EventKind flags used as a mask. Events to notify.
+     * @return true if successfully added
+     */
+    bool add_statistics_listener(
+            std::shared_ptr<fastdds::statistics::IListener> listener,
+            uint32_t kind);
+
+    /**
+     * Remove a listener from receiving statistics backend callbacks
+     * @param listener
+     * @param kind combination of fastdds::statistics::EventKind flags used as a mask. Events to ignore.
+     * @return true if successfully removed
+     */
+    bool remove_statistics_listener(
+            std::shared_ptr<fastdds::statistics::IListener> listener,
+            uint32_t kind);
+
+    /**
+     * @brief Set the enabled statistics writers mask
+     *
+     * @param enabled_writers The new mask to set
+     */
+    void set_enabled_statistics_writers_mask(
+            uint32_t enabled_writers);
+
+    /**
+     * Creates the monitor service in this RTPSParticipant with the provided interfaces.
+     *
+     * @param sq reference to the object implementing the StatusQueryable interface.
+     * It will usually be the DDS DomainParticipant
+     *
+     * @return A const pointer to the listener (implemented within the RTPSParticipant)
+     *
+     * @note Not supported yet. Currently always returns nullptr
+     */
+    const fastdds::statistics::rtps::IStatusObserver* create_monitor_service(
+            fastdds::statistics::rtps::IStatusQueryable& status_queryable);
+
+    /**
+     * Creates the monitor service in this RTPSParticipant with a simple default
+     * implementation of the IStatusQueryable.
+     *
+     * @return true if the monitor service could be correctly created.
+     *
+     * @note Not supported yet. Currently always returns false
+     */
+    bool create_monitor_service();
+
+    /**
+     * Returns whether the monitor service in created in this RTPSParticipant.
+     *
+     * @return true if the monitor service is created.
+     * @return false otherwise.
+     *
+     * @note Not supported yet. Currently always returns false
+     */
+    bool is_monitor_service_created() const;
+
+    /**
+     * Enables the monitor service in this RTPSParticipant.
+     *
+     * @return true if the monitor service could be correctly enabled.
+     *
+     * @note Not supported yet. Currently always returns false
+     */
+    bool enable_monitor_service() const;
+
+    /**
+     * Disables the monitor service in this RTPSParticipant. Does nothing if the service was not enabled before.
+     *
+     * @return true if the monitor service could be correctly disabled.
+     * @return false if the service could not be properly disabled or if the monitor service was not previously enabled.
+     *
+     * @note Not supported yet. Currently always returns false
+     */
+    bool disable_monitor_service() const;
+
+    /**
+     * fills in the ParticipantProxyData from a MonitorService Message
+     *
+     * @param [out] data Proxy to fill
+     * @param [in] msg MonitorService Message to get the proxy information from.
+     *
+     * @return true if the operation succeeds.
+     */
+    bool fill_discovery_data_from_cdr_message(
+            fastrtps::rtps::ParticipantProxyData& data,
+            fastdds::statistics::MonitorServiceStatusData& msg);
+
+    /**
+     * fills in the WriterProxyData from a MonitorService Message
+     *
+     * @param [out] data Proxy to fill.
+     * @param [in] msg MonitorService Message to get the proxy information from.
+     *
+     * @return true if the operation succeeds.
+     */
+    bool fill_discovery_data_from_cdr_message(
+            fastrtps::rtps::WriterProxyData& data,
+            fastdds::statistics::MonitorServiceStatusData& msg);
+
+    /**
+     * fills in the ReaderProxyData from a MonitorService Message
+     *
+     * @param [out] data Proxy to fill.
+     * @param [in] msg MonitorService Message to get the proxy information from.
+     *
+     * @return true if the operation succeeds.
+     */
+    bool fill_discovery_data_from_cdr_message(
+            fastrtps::rtps::ReaderProxyData& data,
+            fastdds::statistics::MonitorServiceStatusData& msg);
+
+#endif // FASTDDS_STATISTICS
+
+protected:
 
     //!Pointer to the implementation.
     RTPSParticipantImpl* mp_impl;
+
 };
 
-}
+} // namespace rtps
 } /* namespace rtps */
 } /* namespace eprosima */
 

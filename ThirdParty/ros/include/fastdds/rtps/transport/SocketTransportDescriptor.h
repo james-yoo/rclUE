@@ -15,54 +15,91 @@
 #ifndef _FASTDDS_SOCKET_TRANSPORT_DESCRIPTOR_H_
 #define _FASTDDS_SOCKET_TRANSPORT_DESCRIPTOR_H_
 
-#include <fastdds/rtps/transport/TransportDescriptorInterface.h>
-
-#ifdef _WIN32
 #include <cstdint>
-#endif
 #include <vector>
 #include <string>
 
-namespace eprosima{
-namespace fastdds{
-namespace rtps{
+#include <fastdds/rtps/transport/network/AllowedNetworkInterface.hpp>
+#include <fastdds/rtps/transport/network/BlockedNetworkInterface.hpp>
+#include <fastdds/rtps/transport/network/NetmaskFilterKind.hpp>
+#include <fastdds/rtps/transport/PortBasedTransportDescriptor.hpp>
 
-class TransportInterface;
+namespace eprosima {
+namespace fastdds {
+namespace rtps {
 
-static const uint8_t s_defaultTTL = 1;
+//! Default time to live (TTL)
+constexpr uint8_t s_defaultTTL = 1;
 
 /**
  * Virtual base class for the data type used to define configuration of transports using sockets.
+ *
+ * - \c sendBufferSize: size of the sending buffer of the socket (in octets).
+ *
+ * - \c receiveBufferSize: size of the receiving buffer of the socket (in octets).
+ *
+ * - \c interfaceWhiteList: list of allowed interfaces.
+ *
+ * - \c TTL: time to live, in number of hops.
+ *
  * @ingroup RTPS_MODULE
  * */
-struct SocketTransportDescriptor : public TransportDescriptorInterface
+struct SocketTransportDescriptor : public PortBasedTransportDescriptor
 {
-    SocketTransportDescriptor(
+    //! Constructor
+    RTPS_DllAPI SocketTransportDescriptor(
             uint32_t maximumMessageSize,
             uint32_t maximumInitialPeersRange)
-        : TransportDescriptorInterface(maximumMessageSize, maximumInitialPeersRange)
+        : PortBasedTransportDescriptor(maximumMessageSize, maximumInitialPeersRange)
         , sendBufferSize(0)
         , receiveBufferSize(0)
+        , netmask_filter(NetmaskFilterKind::AUTO)
         , TTL(s_defaultTTL)
-    {}
+    {
+    }
 
-    SocketTransportDescriptor(const SocketTransportDescriptor& t)
-        : TransportDescriptorInterface(t)
-        , sendBufferSize(t.sendBufferSize)
-        , receiveBufferSize(t.receiveBufferSize)
-        , TTL(t.TTL)
-    {}
+    //! Copy constructor
+    RTPS_DllAPI SocketTransportDescriptor(
+            const SocketTransportDescriptor& t) = default;
 
-    virtual ~SocketTransportDescriptor(){}
+    //! Copy assignment
+    RTPS_DllAPI SocketTransportDescriptor& operator =(
+            const SocketTransportDescriptor& t) = default;
 
-    virtual uint32_t min_send_buffer_size() const override { return sendBufferSize; }
+    //! Destructor
+    virtual RTPS_DllAPI ~SocketTransportDescriptor() = default;
+
+    virtual RTPS_DllAPI uint32_t min_send_buffer_size() const override
+    {
+        return sendBufferSize;
+    }
+
+    //! Comparison operator
+    bool RTPS_DllAPI operator ==(
+            const SocketTransportDescriptor& t) const
+    {
+        return (this->sendBufferSize == t.min_send_buffer_size() &&
+               this->receiveBufferSize == t.receiveBufferSize &&
+               this->interfaceWhiteList == t.interfaceWhiteList &&
+               this->netmask_filter == t.netmask_filter &&
+               this->interface_allowlist == t.interface_allowlist &&
+               this->interface_blocklist == t.interface_blocklist &&
+               this->TTL == t.TTL &&
+               PortBasedTransportDescriptor::operator ==(t));
+    }
 
     //! Length of the send buffer.
     uint32_t sendBufferSize;
     //! Length of the receive buffer.
     uint32_t receiveBufferSize;
-    //! Allowed interfaces in an IP string format.
+    //! Allowed interfaces in an IP or device name string format.
     std::vector<std::string> interfaceWhiteList;
+    //! Transport's netmask filter configuration.
+    NetmaskFilterKind netmask_filter;
+    //! Allowed interfaces in an IP or device name string format, each with a specific netmask filter configuration.
+    std::vector<AllowedNetworkInterface> interface_allowlist;
+    //! Blocked interfaces in an IP or device name string format.
+    std::vector<BlockedNetworkInterface> interface_blocklist;
     //! Specified time to live (8bit - 255 max TTL)
     uint8_t TTL;
 };

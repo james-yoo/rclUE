@@ -20,13 +20,11 @@
 #ifndef _FASTDDS_RTPS_ATTRIBUTES_READERATTRIBUTES_H_
 #define _FASTDDS_RTPS_ATTRIBUTES_READERATTRIBUTES_H_
 
-#include <fastdds/rtps/common/Time_t.h>
-#include <fastdds/rtps/common/Guid.h>
 #include <fastdds/rtps/attributes/EndpointAttributes.h>
+#include <fastdds/rtps/attributes/ThreadSettings.hpp>
+#include <fastdds/rtps/common/Time_t.h>
 #include <fastrtps/qos/QosPolicies.h>
 #include <fastrtps/utils/collections/ResourceLimitedContainerConfig.hpp>
-
-#include <functional>
 
 namespace eprosima {
 namespace fastrtps {
@@ -42,13 +40,15 @@ public:
 
     ReaderTimes()
     {
-        initialAcknackDelay.nanosec = 70*1000*1000;
-        heartbeatResponseDelay.nanosec = 5*1000*1000;
+        initialAcknackDelay.nanosec = 70 * 1000 * 1000;
+        heartbeatResponseDelay.nanosec = 5 * 1000 * 1000;
     }
 
-    virtual ~ReaderTimes() {}
+    virtual ~ReaderTimes()
+    {
+    }
 
-    bool operator==(
+    bool operator ==(
             const ReaderTimes& b) const
     {
         return (this->initialAcknackDelay == b.initialAcknackDelay)  &&
@@ -57,7 +57,7 @@ public:
 
     //!Initial AckNack delay. Default value 70ms.
     Duration_t initialAcknackDelay;
-    //!Delay to be applied when a hearbeat message is received, default value 5ms.
+    //!Delay to be applied when a HEARTBEAT message is received, default value 5ms.
     Duration_t heartbeatResponseDelay;
 };
 
@@ -78,9 +78,11 @@ public:
         endpoint.endpointKind = READER;
         endpoint.durabilityKind = VOLATILE;
         endpoint.reliabilityKind = BEST_EFFORT;
-    };
+    }
 
-    virtual ~ReaderAttributes() {};
+    virtual ~ReaderAttributes()
+    {
+    }
 
     //!Attributes of the associated endpoint.
     EndpointAttributes endpoint;
@@ -102,6 +104,9 @@ public:
 
     //! Define the allocation behaviour for matched-writer-dependent collections.
     ResourceLimitedContainerConfig matched_writers_allocation;
+
+    //! Thread settings for the data-sharing listener thread
+    fastdds::rtps::ThreadSettings data_sharing_listener_thread;
 };
 
 } /* namespace rtps */
