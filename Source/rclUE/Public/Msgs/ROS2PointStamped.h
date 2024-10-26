@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2StdHeader.h"
 
 
 // Generated
@@ -29,7 +29,7 @@ public:
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSHeader Header;
+	FROSStdHeader Header;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Point = FVector::ZeroVector;

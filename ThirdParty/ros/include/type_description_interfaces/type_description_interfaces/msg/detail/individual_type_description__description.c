@@ -23,8 +23,8 @@ type_description_interfaces__msg__IndividualTypeDescription__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "type_description_interfaces/msg/detail/field_type__functions.h"
 #include "type_description_interfaces/msg/detail/field__functions.h"
+#include "type_description_interfaces/msg/detail/field_type__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

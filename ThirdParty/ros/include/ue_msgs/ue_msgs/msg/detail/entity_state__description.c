@@ -24,10 +24,10 @@ ue_msgs__msg__EntityState__get_type_hash(
 
 // Include directives for referenced types
 #include "geometry_msgs/msg/detail/quaternion__functions.h"
-#include "geometry_msgs/msg/detail/vector3__functions.h"
-#include "geometry_msgs/msg/detail/point__functions.h"
 #include "geometry_msgs/msg/detail/twist__functions.h"
+#include "geometry_msgs/msg/detail/vector3__functions.h"
 #include "geometry_msgs/msg/detail/pose__functions.h"
+#include "geometry_msgs/msg/detail/point__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG
