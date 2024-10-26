@@ -24,8 +24,8 @@ rcl_interfaces__msg__ParameterEventDescriptors__get_type_hash(
 
 // Include directives for referenced types
 #include "rcl_interfaces/msg/detail/floating_point_range__functions.h"
-#include "rcl_interfaces/msg/detail/integer_range__functions.h"
 #include "rcl_interfaces/msg/detail/parameter_descriptor__functions.h"
+#include "rcl_interfaces/msg/detail/integer_range__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

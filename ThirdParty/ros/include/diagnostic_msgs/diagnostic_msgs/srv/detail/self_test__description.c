@@ -68,10 +68,10 @@ diagnostic_msgs__srv__SelfTest_Event__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
+#include "builtin_interfaces/msg/detail/time__functions.h"
 #include "diagnostic_msgs/msg/detail/key_value__functions.h"
 #include "diagnostic_msgs/msg/detail/diagnostic_status__functions.h"
 #include "service_msgs/msg/detail/service_event_info__functions.h"
-#include "builtin_interfaces/msg/detail/time__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

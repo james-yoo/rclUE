@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2StdHeader.h"
+#include "Msgs/ROS2Header.h"
 #include "rosidl_runtime_c/string_functions.h"
 #include "geometry_msgs/msg/detail/transform__functions.h"
 #include "Msgs/ROS2Twist.h"
@@ -35,7 +35,7 @@ public:
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSStdHeader Header;
+	FROSHeader Header;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> JointNames;

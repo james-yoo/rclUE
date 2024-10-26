@@ -23,8 +23,8 @@ example_interfaces__msg__UInt8MultiArray__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "example_interfaces/msg/detail/multi_array_dimension__functions.h"
 #include "example_interfaces/msg/detail/multi_array_layout__functions.h"
+#include "example_interfaces/msg/detail/multi_array_dimension__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

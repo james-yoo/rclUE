@@ -68,10 +68,10 @@ action_msgs__srv__CancelGoal_Event__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "builtin_interfaces/msg/detail/time__functions.h"
-#include "unique_identifier_msgs/msg/detail/uuid__functions.h"
 #include "action_msgs/msg/detail/goal_info__functions.h"
+#include "builtin_interfaces/msg/detail/time__functions.h"
 #include "service_msgs/msg/detail/service_event_info__functions.h"
+#include "unique_identifier_msgs/msg/detail/uuid__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

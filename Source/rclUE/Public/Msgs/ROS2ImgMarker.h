@@ -14,12 +14,12 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2StdHeader.h"
-#include "Msgs/ROS2StdColorRGBA.h"
-#include "Msgs/ROS2StdColorRGBA.h"
+#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2ColorRGBA.h"
+#include "Msgs/ROS2ColorRGBA.h"
 #include "Msgs/ROS2Duration.h"
 #include "geometry_msgs/msg/detail/point__functions.h"
-#include "Msgs/ROS2StdColorRGBA.h"
+#include "Msgs/ROS2ColorRGBA.h"
 #include "std_msgs/msg/detail/color_rgba__functions.h"
 
 
@@ -42,7 +42,7 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSStdHeader Header;
+	FROSHeader Header;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Ns;
@@ -63,13 +63,13 @@ public:
 	float Scale = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSStdColorRGBA OutlineColor;
+	FROSColorRGBA OutlineColor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 Filled = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSStdColorRGBA FillColor;
+	FROSColorRGBA FillColor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FROSDuration Lifetime;
@@ -78,7 +78,7 @@ public:
 	TArray<FVector> Points;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FROSStdColorRGBA> OutlineColors;
+	TArray<FROSColorRGBA> OutlineColors;
 
 	
 
@@ -113,7 +113,7 @@ public:
 
 		UROS2Utils::VectorSequenceROSToUEArray<geometry_msgs__msg__Point>(in_ros_data.points.data, Points, in_ros_data.points.size);
 
-		UROS2Utils::SequenceROSToUEArray<std_msgs__msg__ColorRGBA, FROSStdColorRGBA>(in_ros_data.outline_colors.data, OutlineColors, in_ros_data.outline_colors.size);
+		UROS2Utils::SequenceROSToUEArray<std_msgs__msg__ColorRGBA, FROSColorRGBA>(in_ros_data.outline_colors.data, OutlineColors, in_ros_data.outline_colors.size);
 
 		
 	}
@@ -152,7 +152,7 @@ public:
 		std_msgs__msg__ColorRGBA__Sequence__fini(&out_ros_data.outline_colors);
 		}
 		if (!std_msgs__msg__ColorRGBA__Sequence__init(&out_ros_data.outline_colors, OutlineColors.Num())) {UE_LOG_WITH_INFO(LogTemp, Error, TEXT("failed to create array for field out_ros_data.outline_colors  "));}
-		UROS2Utils::ArrayUEToROSSequence<std_msgs__msg__ColorRGBA, FROSStdColorRGBA>(OutlineColors, out_ros_data.outline_colors.data, OutlineColors.Num());
+		UROS2Utils::ArrayUEToROSSequence<std_msgs__msg__ColorRGBA, FROSColorRGBA>(OutlineColors, out_ros_data.outline_colors.data, OutlineColors.Num());
 
 		
 	}

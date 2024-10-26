@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2StdHeader.h"
+#include "Msgs/ROS2Header.h"
 #include "rosidl_runtime_c/string_functions.h"
 #include "Msgs/ROS2MultiDOFJointTrajPoint.h"
 #include "trajectory_msgs/msg/detail/multi_dof_joint_trajectory_point__functions.h"
@@ -32,7 +32,7 @@ public:
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSStdHeader Header;
+	FROSHeader Header;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> JointNames;

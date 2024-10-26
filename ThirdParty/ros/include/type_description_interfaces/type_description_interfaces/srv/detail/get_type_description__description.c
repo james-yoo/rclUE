@@ -68,14 +68,14 @@ type_description_interfaces__srv__GetTypeDescription_Event__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "builtin_interfaces/msg/detail/time__functions.h"
-#include "type_description_interfaces/msg/detail/field_type__functions.h"
-#include "type_description_interfaces/msg/detail/key_value__functions.h"
-#include "type_description_interfaces/msg/detail/type_description__functions.h"
-#include "type_description_interfaces/msg/detail/field__functions.h"
-#include "type_description_interfaces/msg/detail/individual_type_description__functions.h"
 #include "service_msgs/msg/detail/service_event_info__functions.h"
+#include "type_description_interfaces/msg/detail/field__functions.h"
+#include "type_description_interfaces/msg/detail/type_description__functions.h"
+#include "type_description_interfaces/msg/detail/field_type__functions.h"
 #include "type_description_interfaces/msg/detail/type_source__functions.h"
+#include "type_description_interfaces/msg/detail/individual_type_description__functions.h"
+#include "type_description_interfaces/msg/detail/key_value__functions.h"
+#include "builtin_interfaces/msg/detail/time__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

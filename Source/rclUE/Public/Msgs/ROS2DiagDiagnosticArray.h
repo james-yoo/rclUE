@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2StdHeader.h"
+#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2DiagDiagnosticStatus.h"
 #include "diagnostic_msgs/msg/detail/diagnostic_status__functions.h"
 
@@ -31,7 +31,7 @@ public:
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSStdHeader Header;
+	FROSHeader Header;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FROSDiagDiagnosticStatus> Status;
