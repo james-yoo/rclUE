@@ -14,9 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2Pose.h"
-
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2PoseStamped.generated.h"
@@ -24,67 +23,55 @@
 USTRUCT(Blueprintable)
 struct RCLUE_API FROSPoseStamped
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSStdHeader Header;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSHeader Header;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSPose Pose;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSPose Pose;
+    FROSPoseStamped()
+    {
+    }
 
-	
+    void SetFromROS2(const geometry_msgs__msg__PoseStamped& in_ros_data)
+    {
+        Header.SetFromROS2(in_ros_data.header);
 
-	FROSPoseStamped()
-	{
-		
-	}
+        Pose.SetFromROS2(in_ros_data.pose);
+    }
 
-	void SetFromROS2(const geometry_msgs__msg__PoseStamped& in_ros_data)
-	{
-    	Header.SetFromROS2(in_ros_data.header);
+    void SetROS2(geometry_msgs__msg__PoseStamped& out_ros_data) const
+    {
+        Header.SetROS2(out_ros_data.header);
 
-		Pose.SetFromROS2(in_ros_data.pose);
-
-		
-	}
-
-	void SetROS2(geometry_msgs__msg__PoseStamped& out_ros_data) const
-	{
-    	Header.SetROS2(out_ros_data.header);
-
-		Pose.SetROS2(out_ros_data.pose);
-
-		
-	}
+        Pose.SetROS2(out_ros_data.pose);
+    }
 };
 
 UCLASS()
 class RCLUE_API UROS2PoseStampedMsg : public UROS2GenericMsg
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void Init() override;
-	virtual void Fini() override;
+    virtual void Init() override;
+    virtual void Fini() override;
 
-	virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
-	
-  	UFUNCTION(BlueprintCallable)
-	void SetMsg(const FROSPoseStamped& Input);
-	
-  	UFUNCTION(BlueprintCallable)
-	void GetMsg(FROSPoseStamped& Output) const;
-	
-	virtual void* Get() override;
+    virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
 
-	
+    UFUNCTION(BlueprintCallable)
+    void SetMsg(const FROSPoseStamped& Input);
 
+    UFUNCTION(BlueprintCallable)
+    void GetMsg(FROSPoseStamped& Output) const;
+
+    virtual void* Get() override;
 
 private:
-	virtual FString MsgToString() const override;
+    virtual FString MsgToString() const override;
 
-	geometry_msgs__msg__PoseStamped pose_stamped_msg;
+    geometry_msgs__msg__PoseStamped pose_stamped_msg;
 };

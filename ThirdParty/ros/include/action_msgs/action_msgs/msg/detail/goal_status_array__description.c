@@ -23,10 +23,10 @@ action_msgs__msg__GoalStatusArray__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "action_msgs/msg/detail/goal_info__functions.h"
 #include "builtin_interfaces/msg/detail/time__functions.h"
-#include "action_msgs/msg/detail/goal_status__functions.h"
+#include "action_msgs/msg/detail/goal_info__functions.h"
 #include "unique_identifier_msgs/msg/detail/uuid__functions.h"
+#include "action_msgs/msg/detail/goal_status__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

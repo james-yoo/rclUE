@@ -24,9 +24,9 @@ geometry_msgs__msg__WrenchStamped__get_type_hash(
 
 // Include directives for referenced types
 #include "builtin_interfaces/msg/detail/time__functions.h"
+#include "geometry_msgs/msg/detail/vector3__functions.h"
 #include "geometry_msgs/msg/detail/wrench__functions.h"
 #include "std_msgs/msg/detail/header__functions.h"
-#include "geometry_msgs/msg/detail/vector3__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

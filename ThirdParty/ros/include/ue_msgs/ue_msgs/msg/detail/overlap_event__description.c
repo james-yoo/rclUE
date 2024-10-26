@@ -23,9 +23,9 @@ ue_msgs__msg__OverlapEvent__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "geometry_msgs/msg/detail/vector3__functions.h"
 #include "geometry_msgs/msg/detail/point__functions.h"
 #include "ue_msgs/msg/detail/hit_result__functions.h"
+#include "geometry_msgs/msg/detail/vector3__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

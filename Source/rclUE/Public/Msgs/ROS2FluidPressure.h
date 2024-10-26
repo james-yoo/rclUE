@@ -14,8 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
-
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2FluidPressure.generated.h"
@@ -23,74 +22,62 @@
 USTRUCT(Blueprintable)
 struct RCLUE_API FROSFluidPressure
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSStdHeader Header;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSHeader Header;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    double FluidPressure = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double FluidPressure = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    double Variance = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double Variance = 0.f;
+    FROSFluidPressure()
+    {
+    }
 
-	
+    void SetFromROS2(const sensor_msgs__msg__FluidPressure& in_ros_data)
+    {
+        Header.SetFromROS2(in_ros_data.header);
 
-	FROSFluidPressure()
-	{
-		
-	}
+        FluidPressure = in_ros_data.fluid_pressure;
 
-	void SetFromROS2(const sensor_msgs__msg__FluidPressure& in_ros_data)
-	{
-    	Header.SetFromROS2(in_ros_data.header);
+        Variance = in_ros_data.variance;
+    }
 
-		FluidPressure = in_ros_data.fluid_pressure;
+    void SetROS2(sensor_msgs__msg__FluidPressure& out_ros_data) const
+    {
+        Header.SetROS2(out_ros_data.header);
 
-		Variance = in_ros_data.variance;
+        out_ros_data.fluid_pressure = FluidPressure;
 
-		
-	}
-
-	void SetROS2(sensor_msgs__msg__FluidPressure& out_ros_data) const
-	{
-    	Header.SetROS2(out_ros_data.header);
-
-		out_ros_data.fluid_pressure = FluidPressure;
-
-		out_ros_data.variance = Variance;
-
-		
-	}
+        out_ros_data.variance = Variance;
+    }
 };
 
 UCLASS()
 class RCLUE_API UROS2FluidPressureMsg : public UROS2GenericMsg
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void Init() override;
-	virtual void Fini() override;
+    virtual void Init() override;
+    virtual void Fini() override;
 
-	virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
-	
-  	UFUNCTION(BlueprintCallable)
-	void SetMsg(const FROSFluidPressure& Input);
-	
-  	UFUNCTION(BlueprintCallable)
-	void GetMsg(FROSFluidPressure& Output) const;
-	
-	virtual void* Get() override;
+    virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
 
-	
+    UFUNCTION(BlueprintCallable)
+    void SetMsg(const FROSFluidPressure& Input);
 
+    UFUNCTION(BlueprintCallable)
+    void GetMsg(FROSFluidPressure& Output) const;
+
+    virtual void* Get() override;
 
 private:
-	virtual FString MsgToString() const override;
+    virtual FString MsgToString() const override;
 
-	sensor_msgs__msg__FluidPressure fluid_pressure_msg;
+    sensor_msgs__msg__FluidPressure fluid_pressure_msg;
 };

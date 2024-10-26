@@ -23,8 +23,8 @@ rmw_dds_common__msg__ParticipantEntitiesInfo__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
-#include "rmw_dds_common/msg/detail/gid__functions.h"
 #include "rmw_dds_common/msg/detail/node_entities_info__functions.h"
+#include "rmw_dds_common/msg/detail/gid__functions.h"
 
 // Hashes for external referenced types
 #ifndef NDEBUG

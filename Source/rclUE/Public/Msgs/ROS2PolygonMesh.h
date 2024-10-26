@@ -14,11 +14,10 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2PointCloud2.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "Msgs/ROS2Vertices.h"
 #include "pcl_msgs/msg/detail/vertices__functions.h"
-
 
 // Generated
 #include "ROS2PolygonMesh.generated.h"
@@ -26,78 +25,72 @@
 USTRUCT(Blueprintable)
 struct RCLUE_API FROSPolygonMesh
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSStdHeader Header;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSHeader Header;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSPointCloud2 Cloud;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSPointCloud2 Cloud;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TArray<FROSVertices> Polygons;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FROSVertices> Polygons;
+    FROSPolygonMesh()
+    {
+    }
 
-	
+    void SetFromROS2(const pcl_msgs__msg__PolygonMesh& in_ros_data)
+    {
+        Header.SetFromROS2(in_ros_data.header);
 
-	FROSPolygonMesh()
-	{
-		
-	}
+        Cloud.SetFromROS2(in_ros_data.cloud);
 
-	void SetFromROS2(const pcl_msgs__msg__PolygonMesh& in_ros_data)
-	{
-    	Header.SetFromROS2(in_ros_data.header);
+        UROS2Utils::SequenceROSToUEArray<pcl_msgs__msg__Vertices, FROSVertices>(
+            in_ros_data.polygons.data, Polygons, in_ros_data.polygons.size);
+    }
 
-		Cloud.SetFromROS2(in_ros_data.cloud);
+    void SetROS2(pcl_msgs__msg__PolygonMesh& out_ros_data) const
+    {
+        Header.SetROS2(out_ros_data.header);
 
-		UROS2Utils::SequenceROSToUEArray<pcl_msgs__msg__Vertices, FROSVertices>(in_ros_data.polygons.data, Polygons, in_ros_data.polygons.size);
+        Cloud.SetROS2(out_ros_data.cloud);
 
-		
-	}
-
-	void SetROS2(pcl_msgs__msg__PolygonMesh& out_ros_data) const
-	{
-    	Header.SetROS2(out_ros_data.header);
-
-		Cloud.SetROS2(out_ros_data.cloud);
-
-		if (out_ros_data.polygons.data) {
-		pcl_msgs__msg__Vertices__Sequence__fini(&out_ros_data.polygons);
-		}
-		if (!pcl_msgs__msg__Vertices__Sequence__init(&out_ros_data.polygons, Polygons.Num())) {UE_LOG_WITH_INFO(LogTemp, Error, TEXT("failed to create array for field out_ros_data.polygons  "));}
-		UROS2Utils::ArrayUEToROSSequence<pcl_msgs__msg__Vertices, FROSVertices>(Polygons, out_ros_data.polygons.data, Polygons.Num());
-
-		
-	}
+        if (out_ros_data.polygons.data)
+        {
+            pcl_msgs__msg__Vertices__Sequence__fini(&out_ros_data.polygons);
+        }
+        if (!pcl_msgs__msg__Vertices__Sequence__init(&out_ros_data.polygons, Polygons.Num()))
+        {
+            UE_LOG_WITH_INFO(LogTemp, Error, TEXT("failed to create array for field out_ros_data.polygons  "));
+        }
+        UROS2Utils::ArrayUEToROSSequence<pcl_msgs__msg__Vertices, FROSVertices>(
+            Polygons, out_ros_data.polygons.data, Polygons.Num());
+    }
 };
 
 UCLASS()
 class RCLUE_API UROS2PolygonMeshMsg : public UROS2GenericMsg
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void Init() override;
-	virtual void Fini() override;
+    virtual void Init() override;
+    virtual void Fini() override;
 
-	virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
-	
-  	UFUNCTION(BlueprintCallable)
-	void SetMsg(const FROSPolygonMesh& Input);
-	
-  	UFUNCTION(BlueprintCallable)
-	void GetMsg(FROSPolygonMesh& Output) const;
-	
-	virtual void* Get() override;
+    virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
 
-	
+    UFUNCTION(BlueprintCallable)
+    void SetMsg(const FROSPolygonMesh& Input);
 
+    UFUNCTION(BlueprintCallable)
+    void GetMsg(FROSPolygonMesh& Output) const;
+
+    virtual void* Get() override;
 
 private:
-	virtual FString MsgToString() const override;
+    virtual FString MsgToString() const override;
 
-	pcl_msgs__msg__PolygonMesh polygon_mesh_msg;
+    pcl_msgs__msg__PolygonMesh polygon_mesh_msg;
 };

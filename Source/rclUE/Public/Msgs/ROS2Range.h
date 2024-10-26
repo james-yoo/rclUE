@@ -14,8 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
-
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2Range.generated.h"
@@ -23,114 +22,104 @@
 USTRUCT(Blueprintable)
 struct RCLUE_API FROSRange
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-		static constexpr uint8 ULTRASOUND = 0;
-	static constexpr uint8 INFRARED = 1;
+    static constexpr uint8 ULTRASOUND = 0;
+    static constexpr uint8 INFRARED = 1;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSStdHeader Header;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSHeader Header;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    uint8 RadiationType = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 RadiationType = 0;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float FieldOfView = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FieldOfView = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MinRange = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MinRange = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MaxRange = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MaxRange = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float Range = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Range = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float Variance = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Variance = 0.f;
+    FROSRange()
+    {
+    }
 
-	
+    void SetFromROS2(const sensor_msgs__msg__Range& in_ros_data)
+    {
+        Header.SetFromROS2(in_ros_data.header);
 
-	FROSRange()
-	{
-		
-	}
+        RadiationType = in_ros_data.radiation_type;
 
-	void SetFromROS2(const sensor_msgs__msg__Range& in_ros_data)
-	{
-    	Header.SetFromROS2(in_ros_data.header);
+        FieldOfView = in_ros_data.field_of_view;
 
-		RadiationType = in_ros_data.radiation_type;
+        MinRange = in_ros_data.min_range;
 
-		FieldOfView = in_ros_data.field_of_view;
+        MaxRange = in_ros_data.max_range;
 
-		MinRange = in_ros_data.min_range;
+        Range = in_ros_data.range;
 
-		MaxRange = in_ros_data.max_range;
+        Variance = in_ros_data.variance;
+    }
 
-		Range = in_ros_data.range;
+    void SetROS2(sensor_msgs__msg__Range& out_ros_data) const
+    {
+        Header.SetROS2(out_ros_data.header);
 
-		Variance = in_ros_data.variance;
+        out_ros_data.radiation_type = RadiationType;
 
-		
-	}
+        out_ros_data.field_of_view = FieldOfView;
 
-	void SetROS2(sensor_msgs__msg__Range& out_ros_data) const
-	{
-    	Header.SetROS2(out_ros_data.header);
+        out_ros_data.min_range = MinRange;
 
-		out_ros_data.radiation_type = RadiationType;
+        out_ros_data.max_range = MaxRange;
 
-		out_ros_data.field_of_view = FieldOfView;
+        out_ros_data.range = Range;
 
-		out_ros_data.min_range = MinRange;
-
-		out_ros_data.max_range = MaxRange;
-
-		out_ros_data.range = Range;
-
-		out_ros_data.variance = Variance;
-
-		
-	}
+        out_ros_data.variance = Variance;
+    }
 };
 
 UCLASS()
 class RCLUE_API UROS2RangeMsg : public UROS2GenericMsg
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void Init() override;
-	virtual void Fini() override;
+    virtual void Init() override;
+    virtual void Fini() override;
 
-	virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
-	
-  	UFUNCTION(BlueprintCallable)
-	void SetMsg(const FROSRange& Input);
-	
-  	UFUNCTION(BlueprintCallable)
-	void GetMsg(FROSRange& Output) const;
-	
-	virtual void* Get() override;
+    virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
 
-	UFUNCTION(BlueprintCallable)
-	static uint8 CONST_ULTRASOUND()
-	{
-		return FROSRange::ULTRASOUND;
-	}
-	UFUNCTION(BlueprintCallable)
-	static uint8 CONST_INFRARED()
-	{
-		return FROSRange::INFRARED;
-	}
-	
+    UFUNCTION(BlueprintCallable)
+    void SetMsg(const FROSRange& Input);
 
+    UFUNCTION(BlueprintCallable)
+    void GetMsg(FROSRange& Output) const;
+
+    virtual void* Get() override;
+
+    UFUNCTION(BlueprintCallable)
+    static uint8 CONST_ULTRASOUND()
+    {
+        return FROSRange::ULTRASOUND;
+    }
+    UFUNCTION(BlueprintCallable)
+    static uint8 CONST_INFRARED()
+    {
+        return FROSRange::INFRARED;
+    }
 
 private:
-	virtual FString MsgToString() const override;
+    virtual FString MsgToString() const override;
 
-	sensor_msgs__msg__Range range_msg;
+    sensor_msgs__msg__Range range_msg;
 };

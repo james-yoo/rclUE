@@ -23,10 +23,10 @@ geometry_msgs__msg__TwistWithCovarianceStamped__get_type_hash(
 #include <string.h>
 
 // Include directives for referenced types
+#include "builtin_interfaces/msg/detail/time__functions.h"
 #include "geometry_msgs/msg/detail/vector3__functions.h"
 #include "geometry_msgs/msg/detail/twist__functions.h"
 #include "geometry_msgs/msg/detail/twist_with_covariance__functions.h"
-#include "builtin_interfaces/msg/detail/time__functions.h"
 #include "std_msgs/msg/detail/header__functions.h"
 
 // Hashes for external referenced types

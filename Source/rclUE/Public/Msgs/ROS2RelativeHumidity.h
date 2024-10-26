@@ -14,8 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
-
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2RelativeHumidity.generated.h"
@@ -23,74 +22,62 @@
 USTRUCT(Blueprintable)
 struct RCLUE_API FROSRelativeHumidity
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FROSStdHeader Header;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FROSHeader Header;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    double RelativeHumidity = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double RelativeHumidity = 0.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    double Variance = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double Variance = 0.f;
+    FROSRelativeHumidity()
+    {
+    }
 
-	
+    void SetFromROS2(const sensor_msgs__msg__RelativeHumidity& in_ros_data)
+    {
+        Header.SetFromROS2(in_ros_data.header);
 
-	FROSRelativeHumidity()
-	{
-		
-	}
+        RelativeHumidity = in_ros_data.relative_humidity;
 
-	void SetFromROS2(const sensor_msgs__msg__RelativeHumidity& in_ros_data)
-	{
-    	Header.SetFromROS2(in_ros_data.header);
+        Variance = in_ros_data.variance;
+    }
 
-		RelativeHumidity = in_ros_data.relative_humidity;
+    void SetROS2(sensor_msgs__msg__RelativeHumidity& out_ros_data) const
+    {
+        Header.SetROS2(out_ros_data.header);
 
-		Variance = in_ros_data.variance;
+        out_ros_data.relative_humidity = RelativeHumidity;
 
-		
-	}
-
-	void SetROS2(sensor_msgs__msg__RelativeHumidity& out_ros_data) const
-	{
-    	Header.SetROS2(out_ros_data.header);
-
-		out_ros_data.relative_humidity = RelativeHumidity;
-
-		out_ros_data.variance = Variance;
-
-		
-	}
+        out_ros_data.variance = Variance;
+    }
 };
 
 UCLASS()
 class RCLUE_API UROS2RelativeHumidityMsg : public UROS2GenericMsg
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void Init() override;
-	virtual void Fini() override;
+    virtual void Init() override;
+    virtual void Fini() override;
 
-	virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
-	
-  	UFUNCTION(BlueprintCallable)
-	void SetMsg(const FROSRelativeHumidity& Input);
-	
-  	UFUNCTION(BlueprintCallable)
-	void GetMsg(FROSRelativeHumidity& Output) const;
-	
-	virtual void* Get() override;
+    virtual const rosidl_message_type_support_t* GetTypeSupport() const override;
 
-	
+    UFUNCTION(BlueprintCallable)
+    void SetMsg(const FROSRelativeHumidity& Input);
 
+    UFUNCTION(BlueprintCallable)
+    void GetMsg(FROSRelativeHumidity& Output) const;
+
+    virtual void* Get() override;
 
 private:
-	virtual FString MsgToString() const override;
+    virtual FString MsgToString() const override;
 
-	sensor_msgs__msg__RelativeHumidity relative_humidity_msg;
+    sensor_msgs__msg__RelativeHumidity relative_humidity_msg;
 };
