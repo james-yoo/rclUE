@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
 
 // Generated
@@ -27,7 +27,7 @@ struct RCLUE_API FROSImg
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere)
     unsigned int Height = 0;

@@ -14,9 +14,9 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2Img.h"
 #include "Msgs/ROS2RegionOfInterest.h"
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2DisparityImg.generated.h"
@@ -28,7 +28,7 @@ struct RCLUE_API FROSDisparityImg
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FROSImg Image;

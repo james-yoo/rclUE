@@ -14,8 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2PointField.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
 #include "sensor_msgs/msg/detail/point_field__functions.h"
 
@@ -29,7 +29,7 @@ struct RCLUE_API FROSPointCloud2
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere)
     unsigned int Height = 0;

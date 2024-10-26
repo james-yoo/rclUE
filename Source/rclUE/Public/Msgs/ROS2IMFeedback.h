@@ -14,8 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2Pose.h"
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2IMFeedback.generated.h"
@@ -34,7 +34,7 @@ public:
     static constexpr uint8 MOUSE_UP = 5;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString ClientId;

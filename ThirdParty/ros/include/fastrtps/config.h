@@ -17,8 +17,8 @@
 
 #define FASTRTPS_VERSION_MAJOR 2
 #define FASTRTPS_VERSION_MINOR 6
-#define FASTRTPS_VERSION_MICRO 4
-#define FASTRTPS_VERSION_STR "2.6.4"
+#define FASTRTPS_VERSION_MICRO 9
+#define FASTRTPS_VERSION_STR "2.6.9"
 
 #define GEN_API_VER 1
 
@@ -94,7 +94,9 @@
 /* Log Macros */
 
 // Log Info
+#ifndef FASTDDS_ENFORCE_LOG_INFO
 /* #undef FASTDDS_ENFORCE_LOG_INFO */
+#endif
 #ifndef HAVE_LOG_NO_INFO
 #define HAVE_LOG_NO_INFO 1
 #endif /* ifndef HAVE_LOG_NO_INFO */

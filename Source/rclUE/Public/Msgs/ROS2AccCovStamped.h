@@ -15,7 +15,7 @@
 
 // Generated Msg/Srv/Action(can be empty)
 #include "Msgs/ROS2AccCov.h"
-#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2AccCovStamped.generated.h"
@@ -27,7 +27,7 @@ struct RCLUE_API FROSAccCovStamped
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FROSAccCov Accel;

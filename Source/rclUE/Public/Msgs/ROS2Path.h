@@ -14,8 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2PoseStamped.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "geometry_msgs/msg/detail/pose_stamped__functions.h"
 
 // Generated
@@ -28,7 +28,7 @@ struct RCLUE_API FROSPath
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<FROSPoseStamped> Poses;

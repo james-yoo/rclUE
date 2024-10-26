@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2StdHeader.h"
 
 // Generated
 #include "ROS2Illuminance.generated.h"
@@ -26,7 +26,7 @@ struct RCLUE_API FROSIlluminance
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     double Illuminance = 0.f;

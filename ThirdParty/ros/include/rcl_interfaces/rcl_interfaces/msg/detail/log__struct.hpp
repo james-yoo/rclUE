@@ -235,12 +235,21 @@ using Log =
   rcl_interfaces::msg::Log_<std::allocator<void>>;
 
 // constant definitions
+#if __cplusplus < 201703L
+// static constexpr member variable definitions are only needed in C++14 and below, deprecated in C++17
 template<typename ContainerAllocator>
 constexpr unsigned char Log_<ContainerAllocator>::DEBUG;
+#endif  // __cplusplus < 201703L
+#if __cplusplus < 201703L
+// static constexpr member variable definitions are only needed in C++14 and below, deprecated in C++17
 template<typename ContainerAllocator>
 constexpr unsigned char Log_<ContainerAllocator>::INFO;
+#endif  // __cplusplus < 201703L
+#if __cplusplus < 201703L
+// static constexpr member variable definitions are only needed in C++14 and below, deprecated in C++17
 template<typename ContainerAllocator>
 constexpr unsigned char Log_<ContainerAllocator>::WARN;
+#endif  // __cplusplus < 201703L
 // guard against 'ERROR' being predefined by MSVC by temporarily undefining it
 #if defined(_WIN32)
 #  if defined(ERROR)
@@ -248,14 +257,20 @@ constexpr unsigned char Log_<ContainerAllocator>::WARN;
 #    undef ERROR
 #  endif
 #endif
+#if __cplusplus < 201703L
+// static constexpr member variable definitions are only needed in C++14 and below, deprecated in C++17
 template<typename ContainerAllocator>
 constexpr unsigned char Log_<ContainerAllocator>::ERROR;
+#endif  // __cplusplus < 201703L
 #if defined(_WIN32)
 #  pragma warning(suppress : 4602)
 #  pragma pop_macro("ERROR")
 #endif
+#if __cplusplus < 201703L
+// static constexpr member variable definitions are only needed in C++14 and below, deprecated in C++17
 template<typename ContainerAllocator>
 constexpr unsigned char Log_<ContainerAllocator>::FATAL;
+#endif  // __cplusplus < 201703L
 
 }  // namespace msg
 

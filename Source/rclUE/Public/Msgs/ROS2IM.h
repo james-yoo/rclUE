@@ -14,10 +14,10 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2IMCtrl.h"
 #include "Msgs/ROS2MenuEntry.h"
 #include "Msgs/ROS2Pose.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "visualization_msgs/msg/detail/interactive_marker_control__functions.h"
 #include "visualization_msgs/msg/detail/menu_entry__functions.h"
 
@@ -31,7 +31,7 @@ struct RCLUE_API FROSIM
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FROSPose Pose;

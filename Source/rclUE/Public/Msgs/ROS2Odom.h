@@ -14,8 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2PoseCov.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "Msgs/ROS2TwistCov.h"
 
 // Generated
@@ -28,7 +28,7 @@ struct RCLUE_API FROSOdom
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString ChildFrameId;

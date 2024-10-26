@@ -15,7 +15,7 @@
 
 // Generated Msg/Srv/Action(can be empty)
 #include "Msgs/ROS2DiagnosticStatus.h"
-#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "diagnostic_msgs/msg/detail/diagnostic_status__functions.h"
 
 // Generated
@@ -28,7 +28,7 @@ struct RCLUE_API FROSDiagnosticArray
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<FROSDiagnosticStatus> Status;

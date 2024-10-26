@@ -14,7 +14,7 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "rosidl_runtime_c/primitives_sequence_functions.h"
 
 // Generated
@@ -49,7 +49,7 @@ public:
     static constexpr uint8 POWER_SUPPLY_TECHNOLOGY_LIMN = 6;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float Voltage = 0.f;

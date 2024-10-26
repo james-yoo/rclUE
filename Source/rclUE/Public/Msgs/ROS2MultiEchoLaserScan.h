@@ -14,8 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2LaserEcho.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "sensor_msgs/msg/detail/laser_echo__functions.h"
 
 // Generated
@@ -28,7 +28,7 @@ struct RCLUE_API FROSMultiEchoLaserScan
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float AngleMin = 0.f;

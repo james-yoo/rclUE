@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <fastdds/rtps/common/Locator.h>
+#include <fastdds/rtps/common/LocatorList.hpp>
 #include <fastdds/rtps/common/LocatorSelector.hpp>
 #include <fastdds/rtps/messages/MessageReceiver.h>
 #include <fastdds/rtps/network/ReceiverResource.h>
@@ -42,7 +43,8 @@ class NetworkFactory
 {
 public:
 
-    NetworkFactory();
+    NetworkFactory(
+            const RTPSParticipantAttributes& PParam);
 
     /**
      * Allow registration of a transport statically, by specifying the transport type and
@@ -215,6 +217,18 @@ public:
      */
     void update_network_interfaces();
 
+    /**
+     * Remove the given participants from the send resource list
+     *
+     * @param send_resource_list List of send resources associated to the local participant.
+     * @param remote_participant_locators List of locators associated to the remote participant.
+     * @param participant_initial_peers List of locators of the initial peers of the local participant.
+     */
+    void remove_participant_associated_send_resources(
+            fastdds::rtps::SendResourceList& send_resource_list,
+            const LocatorList_t& remote_participant_locators,
+            const LocatorList_t& participant_initial_peers) const;
+
 private:
 
     std::vector<std::unique_ptr<fastdds::rtps::TransportInterface>> mRegisteredTransports;
@@ -222,6 +236,12 @@ private:
     uint32_t maxMessageSizeBetweenTransports_;
 
     uint32_t minSendBufferSize_;
+
+    // Whether unicast metatraffic on SHM transport should always be used
+    bool enforce_shm_unicast_metatraffic_ = false;
+
+    // Whether multicast metatraffic on SHM transport should always be used
+    bool enforce_shm_multicast_metatraffic_ = false;
 
     /**
      * Calculate well-known ports.

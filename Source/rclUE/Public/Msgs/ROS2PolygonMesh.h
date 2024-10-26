@@ -14,8 +14,8 @@
 #include "rclcUtilities.h"
 
 // Generated Msg/Srv/Action(can be empty)
-#include "Msgs/ROS2Header.h"
 #include "Msgs/ROS2PointCloud2.h"
+#include "Msgs/ROS2StdHeader.h"
 #include "Msgs/ROS2Vertices.h"
 #include "pcl_msgs/msg/detail/vertices__functions.h"
 
@@ -29,7 +29,7 @@ struct RCLUE_API FROSPolygonMesh
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FROSHeader Header;
+    FROSStdHeader Header;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FROSPointCloud2 Cloud;

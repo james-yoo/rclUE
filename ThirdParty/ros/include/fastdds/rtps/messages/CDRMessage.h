@@ -140,15 +140,18 @@ inline bool readBinaryProperty(
 
 inline bool readPropertySeq(
         CDRMessage_t* msg,
-        PropertySeq& properties);
+        PropertySeq& properties,
+        const uint32_t parameter_length);
 
 inline bool readBinaryPropertySeq(
         CDRMessage_t* msg,
-        BinaryPropertySeq& binary_properties);
+        BinaryPropertySeq& binary_properties,
+        const uint32_t parameter_length);
 
 inline bool readDataHolder(
         CDRMessage_t* msg,
-        DataHolder& data_holder);
+        DataHolder& data_holder,
+        const uint32_t parameter_length);
 
 inline bool readDataHolderSeq(
         CDRMessage_t* msg,
@@ -199,6 +202,21 @@ inline bool appendMsg(
  * @return True if correct.
  */
 /// @{
+
+template<typename T>
+inline bool addPrimitive(
+        CDRMessage_t* msg,
+        T value);
+
+inline bool hasSpace(
+        CDRMessage_t* msg,
+        const uint32_t length);
+
+inline void copyToBuffer(
+        CDRMessage_t* msg,
+        const octet* data,
+        const uint32_t length,
+        bool reverse = false);
 
 inline bool addData(
         CDRMessage_t*,
@@ -311,6 +329,17 @@ inline bool addParticipantGenericMessage(
         const security::ParticipantGenericMessage& message);
 
 ///@}
+
+/**
+ * @brief Skip bytes in serialized buffer
+ *
+ * @param msg The CDR message
+ * @param length The number of bytes to skip
+ * @return true if skipped, false otherwise
+ */
+inline bool skip(
+        CDRMessage_t* msg,
+        uint32_t length);
 
 } /* namespace CDRMessage */
 
