@@ -14,6 +14,7 @@ extern "C"
 #include <stddef.h>
 #include <stdint.h>
 
+
 // Constants defined in the message
 
 // Include directives for member types
@@ -21,25 +22,25 @@ extern "C"
 // Member 'components'
 #include "rosidl_runtime_c/string.h"
 
-    // Struct defined in msg/OverlappingObjects in the package ue_msgs.
-    typedef struct ue_msgs__msg__OverlappingObjects
-    {
-        rosidl_runtime_c__String__Sequence actors;
-        rosidl_runtime_c__String__Sequence components;
-    } ue_msgs__msg__OverlappingObjects;
+// Struct defined in msg/OverlappingObjects in the package ue_msgs.
+typedef struct ue_msgs__msg__OverlappingObjects
+{
+  rosidl_runtime_c__String__Sequence actors;
+  rosidl_runtime_c__String__Sequence components;
+} ue_msgs__msg__OverlappingObjects;
 
-    // Struct for a sequence of ue_msgs__msg__OverlappingObjects.
-    typedef struct ue_msgs__msg__OverlappingObjects__Sequence
-    {
-        ue_msgs__msg__OverlappingObjects* data;
-        /// The number of valid items in data
-        size_t size;
-        /// The number of allocated items in data
-        size_t capacity;
-    } ue_msgs__msg__OverlappingObjects__Sequence;
+// Struct for a sequence of ue_msgs__msg__OverlappingObjects.
+typedef struct ue_msgs__msg__OverlappingObjects__Sequence
+{
+  ue_msgs__msg__OverlappingObjects * data;
+  /// The number of valid items in data
+  size_t size;
+  /// The number of allocated items in data
+  size_t capacity;
+} ue_msgs__msg__OverlappingObjects__Sequence;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif    // UE_MSGS__MSG__DETAIL__OVERLAPPING_OBJECTS__STRUCT_H_
+#endif  // UE_MSGS__MSG__DETAIL__OVERLAPPING_OBJECTS__STRUCT_H_

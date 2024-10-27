@@ -396,11 +396,9 @@ public:
         uint32_t num_bytes = num_items * static_cast<uint32_t>(sizeof(uint32_t));
         bitmap_.fill(0u);
         memcpy(bitmap_.data(), bitmap, num_bytes);
-        // trim unused bits if (0 < num_bits && num_bits % 32 != 0)
-        short shift = num_bits & 31u;
-        if (0 < num_bits && shift != 0)
+        if (0 < num_bits)
         {
-            bitmap_[num_items - 1] &= ~(std::numeric_limits<uint32_t>::max() >> shift);
+            bitmap_[num_items - 1] &= ~(std::numeric_limits<uint32_t>::max() >> (num_bits & 31u));
         }
         calc_maximum_bit_set(num_items, 0);
     }
