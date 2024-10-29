@@ -4,8 +4,9 @@
 #ifndef UE_MSGS__MSG__HIT_RESULT_HPP_
 #define UE_MSGS__MSG__HIT_RESULT_HPP_
 
-#include "ue_msgs/msg/detail/hit_result__builder.hpp"
 #include "ue_msgs/msg/detail/hit_result__struct.hpp"
+#include "ue_msgs/msg/detail/hit_result__builder.hpp"
 #include "ue_msgs/msg/detail/hit_result__traits.hpp"
+#include "ue_msgs/msg/detail/hit_result__type_support.hpp"
 
-#endif    // UE_MSGS__MSG__HIT_RESULT_HPP_
+#endif  // UE_MSGS__MSG__HIT_RESULT_HPP_

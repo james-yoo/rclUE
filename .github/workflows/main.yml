@@ -22,7 +22,9 @@ jobs:
       matrix:
         version:
           - devel
+          - UE5_devel_foxy
           - UE5_devel_humble
+          - UE5_devel_jazzy
     steps:
     - name: Checkout
       uses: actions/checkout@v4
