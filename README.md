@@ -34,7 +34,7 @@ Please download UE5.10 for Linux by following [Unreal Engine for Linux](https://
 ### Missing library
 Due to pre-compiled libraries, ThirdParty/ros/lib/librcl.so dynamically links libyaml.so and libspdlog.so.1, which needs to be provided by/installed on the host system. If not, Unreal fails to load the plugin or package the project without further details.
 
-On some operating systems, even with libyaml and libspdlog installed, the version appendix may does not exist. You can try creating them using:
+On some operating systems, even with libyaml and libspdlog installed, the version appendix may not exist. You can try creating them using:
 
 ```
 cd /lib64
