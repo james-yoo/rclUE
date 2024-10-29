@@ -18,11 +18,11 @@ Maintenance/experimental
 - Ubuntu 22.04 and ROS2 Humble(`UE5_devel_humble` branch)
 - Ubuntu 24.04 and ROS2 Humble(`UE5_devel_jazzy` branch)
 
-Please download UE5.1 for Linux by following [Unreal Engine for Linux](https://www.unrealengine.com/en-US/linux)
+Please download UE5.10 for Linux by following [Unreal Engine for Linux](https://www.unrealengine.com/en-US/linux)
 
 ## Branches
 
-- `devel`: This build of the plugin is based on ROS2 Foxy and has been tested on Ubuntu 20 and UE5.1.
+- `devel`: This build of the plugin is based on ROS2 Foxy and has been tested on Ubuntu 20 and UE5.10.
 - `UE5_devel_foxy`: Same as above.
 - `UE5_devel_humble_20.04`(experimental): This build of the plugin is based on ROS 2 humble and has been tested on Ubuntu 20.04 and UE5.1.
 - `UE5_devel_humble`(experimental): This build of the plugin is based on ROS 2 humble, Ubuntu 22.04 and UE5.1.
@@ -34,7 +34,7 @@ Please download UE5.1 for Linux by following [Unreal Engine for Linux](https://w
 ### Missing library
 Due to pre-compiled libraries, ThirdParty/ros/lib/librcl.so dynamically links libyaml.so and libspdlog.so.1, which needs to be provided by/installed on the host system. If not, Unreal fails to load the plugin or package the project without further details.
 
-On some operating systems, even with libyaml and libspdlog installed, the version appendix may does not exist. You can try creating them using:
+On some operating systems, even with libyaml and libspdlog installed, the version appendix may not exist. You can try creating them using:
 
 ```
 cd /lib64
